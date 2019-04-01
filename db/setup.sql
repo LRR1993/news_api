@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS news_api;
+CREATE DATABASE news_api;
+
+DROP DATABASE IF EXISTS news_api_test;
+CREATE DATABASE news_api_test;
