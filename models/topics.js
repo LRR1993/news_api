@@ -1,5 +1,5 @@
 const connection = require('../db/connection');
 
 exports.getTopics = () => {
-  return connection.select('*').from('shops');
+  return connection.select('*').from('topics');
 };
