@@ -2,9 +2,9 @@ exports.up = function(knex, Promise) {
   console.log('creating comments table ...');
   return knex.schema.createTable('comments', commentsTable => {
     commentsTable.increments('comment_id').primary();
-    commentsTable.foreign('author').references('users.username');
-    commentsTable.foreign('article_id').references('articles.article_id');
-    commentsTable.interger('votes').defaultTo(0);
+    commentsTable.string('author').references('users.username');
+    commentsTable.integer('article_id').references('articles.article_id');
+    commentsTable.integer('votes').defaultTo(0);
     commentsTable.date('created_at');
     commentsTable.text('body');
   });

@@ -10,6 +10,7 @@
     "migrate-rollback": "knex migrate:rollback",
     "test": "mocha ./spec/*.spec.js",
     "seed": "knex seed:run",
+    "seed-test": "NODE_ENV=test knex seed:run",
     "dev": "nodemon listen.js",
     "start": "node listen.js"
   },

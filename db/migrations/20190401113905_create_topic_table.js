@@ -10,6 +10,6 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  console.log('removing houses topics...');
-  return knex.schema.dropTable('houses');
+  console.log('removing topics table...');
+  return knex.schema.dropTable('topics');
 };

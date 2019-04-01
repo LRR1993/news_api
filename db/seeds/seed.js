@@ -10,6 +10,14 @@ exports.seed = (knex, Promise) => {
     .rollback()
     .then(() => knex.migrate.latest())
     .then(() => {
-      // insert data
+      knex('topics')
+        .insert(topicsData)
+        .returning('*');
+    })
+    .then(topicRows => {
+      const usersInserted = knex('users')
+        .insert(usersData)
+        .returning('*');
+      return Promise.all([topicRows, usersInserted]);
     });
 };
