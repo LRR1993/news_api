@@ -3,7 +3,7 @@ const {
   timestampFormat,
   authorFormat,
   commentRef,
-  articleFormat
+  commentFormat
 } = require('../utils');
 
 describe('#timestampFormat', () => {
@@ -156,7 +156,6 @@ describe('#authorFormat', () => {
     expect(authorFormat(input)).to.eql(output);
   });
 });
-
 describe('#commentRef', () => {
   it('doesnt mutate the original information', () => {
     const input = [];
@@ -216,8 +215,7 @@ describe('#commentRef', () => {
     expect(commentRef(input)).to.eql(output);
   });
 });
-
-describe('#articleFormat', () => {
+describe('#commentFormat', () => {
   it('returns correct format for comments schema for an array length of 1', () => {
     const lookup = {
       "They're not exactly dogs, are they?": 1
@@ -242,7 +240,7 @@ describe('#articleFormat', () => {
         created_at: 1511354163389
       }
     ];
-    expect(articleFormat(lookup, data)).to.eql(output);
+    expect(commentFormat(lookup, data)).to.eql(output);
   });
   it('returns correct format for shop schema for an array', () => {
     const lookup = {
@@ -301,6 +299,6 @@ describe('#articleFormat', () => {
         created_at: 1448282163389
       }
     ];
-    expect(articleFormat(lookup, data)).to.eql(output);
+    expect(commentFormat(lookup, data)).to.eql(output);
   });
 });

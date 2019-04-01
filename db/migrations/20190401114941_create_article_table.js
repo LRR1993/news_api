@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
   console.log('creating articles table ...');
   return knex.schema.createTable('articles', articlesTable => {
-    articlesTable.string('article_id');
+    articlesTable.increments('article_id').primary();
     articlesTable.string('title');
     articlesTable.text('body');
     articlesTable.integer('votes').defaultTo(0);

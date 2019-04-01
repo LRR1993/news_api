@@ -7,9 +7,9 @@ const {
 
 const {
   timestampFormat,
-  authorFormat,
   commentRef,
-  articleFormat
+  authorFormat,
+  commentFormat
 } = require('../../utils/utils');
 
 exports.seed = (knex, Promise) => {
@@ -21,11 +21,10 @@ exports.seed = (knex, Promise) => {
         .insert(topicsData)
         .returning('*');
     })
-    .then(topicRows => {
-      const userInserted = knex('users')
+    .then(() => {
+      return knex('users')
         .insert(usersData)
         .returning('*');
-      return Promise.all([topicRows, userInserted]);
     })
     .then(() => {
       const formatedArticles = timestampFormat(articlesData);
@@ -33,9 +32,13 @@ exports.seed = (knex, Promise) => {
         .insert(formatedArticles)
         .returning('*');
     })
-    .then(() => {
+    .then(insertedArticles => {
+      const authorUpdated = authorFormat(commentsData);
+      const timeUpdated = timestampFormat(authorUpdated);
+      const articlelookup = commentRef(insertedArticles);
+      const formattedComments = commentFormat(articlelookup, timeUpdated);
       return knex('comments')
-        .insert(commentsData)
+        .insert(formattedComments)
         .returning('*');
     });
 };

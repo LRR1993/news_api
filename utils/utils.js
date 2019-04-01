@@ -7,7 +7,6 @@ exports.timestampFormat = data => {
   });
   return newData;
 };
-
 exports.authorFormat = data => {
   const newData = [];
   data.forEach(item => {
@@ -16,7 +15,6 @@ exports.authorFormat = data => {
   });
   return newData;
 };
-
 exports.commentRef = articlesData => {
   const comments = {};
   articlesData.forEach(comment => {
@@ -24,7 +22,7 @@ exports.commentRef = articlesData => {
   });
   return comments;
 };
-exports.articleFormat = (articlesLookup, data) => {
+exports.commentFormat = (articlesLookup, data) => {
   const newData = [];
   data.forEach(comment => {
     const { belongs_to, ...remaining } = comment;
