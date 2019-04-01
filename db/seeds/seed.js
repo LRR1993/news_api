@@ -24,8 +24,9 @@ exports.seed = (knex, Promise) => {
     })
     .then(() => {
       const formatedArticles = timestampFormat(articlesData);
-      return knex('articles')
-        .insert(formatedArticles)
-        .returning('*');
+      console.log(formatedArticles);
+      // return knex('articles')
+      //   .insert(formatedArticles)
+      //   .returning('*');
     });
 };

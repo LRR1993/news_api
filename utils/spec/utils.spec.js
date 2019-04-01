@@ -2,6 +2,10 @@ const { expect } = require('chai');
 const { timestampFormat } = require('../utils');
 
 describe('#timestampFormat', () => {
+  it('doesnt mutate the original information', () => {
+    const input = [];
+    expect(timestampFormat(input)).to.not.equal(input);
+  });
   it('changes javascript timestamp into an sql time stamp', () => {
     const input = [
       {
