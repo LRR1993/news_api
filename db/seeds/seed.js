@@ -5,14 +5,19 @@ const {
   usersData
 } = require('../data');
 
-const { timestampFormat } = require('../../utils/utils');
+const {
+  timestampFormat,
+  authorFormat,
+  commentRef,
+  articleFormat
+} = require('../../utils/utils');
 
 exports.seed = (knex, Promise) => {
   return knex.migrate
     .rollback()
     .then(() => knex.migrate.latest())
     .then(() => {
-      knex('topics')
+      return knex('topics')
         .insert(topicsData)
         .returning('*');
     })
@@ -24,9 +29,13 @@ exports.seed = (knex, Promise) => {
     })
     .then(() => {
       const formatedArticles = timestampFormat(articlesData);
-      console.log(formatedArticles);
-      // return knex('articles')
-      //   .insert(formatedArticles)
-      //   .returning('*');
+      return knex('articles')
+        .insert(formatedArticles)
+        .returning('*');
+    })
+    .then(() => {
+      return knex('comments')
+        .insert(commentsData)
+        .returning('*');
     });
 };
