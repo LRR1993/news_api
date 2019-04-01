@@ -99,9 +99,43 @@ describe('/', () => {
         it('return an error when author does not exist', () => {
           return request
             .get('/api/articles?author=not_a_user')
-            .expect(404)
+            .expect(400)
             .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Author: 'not_a_user' Not Found");
+              expect(msg).to.equal("Bad Request: 'not_a_user' Not Found");
+            });
+        });
+        it('accepts a sort query, to sort by topic', () => {
+          return request
+            .get('/api/articles?topic=mitch')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.descendingBy('topic');
+              expect(articles.every(article => article.topic === 'mitch')).to.be
+                .true;
+            });
+        });
+        it('return an error when topic does not exist', () => {
+          return request
+            .get('/api/articles?topic=notATopic')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request: 'notATopic' Not Found");
+            });
+        });
+        it('articles to be in asc order by date by default', () => {
+          return request
+            .get('/api/articles?order=asc')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.ascendingBy('created_at');
+            });
+        });
+        it('returns default behavior, when order query invalid', () => {
+          return request
+            .get('/api/articles?order=notADirection')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.descendingBy('created_at');
             });
         });
       });
