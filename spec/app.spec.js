@@ -54,5 +54,25 @@ describe('/', () => {
           });
       });
     });
+    describe('/articles', () => {
+      describe('DEFAULT BEHAVIOURS', () => {
+        it('GET returns status 200 and returns an array of objects of treasures', () => {
+          return request
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles[0]).to.have.keys(
+                'title',
+                'topic',
+                'author',
+                'body',
+                'created_at',
+                'votes',
+                'article_id'
+              );
+            });
+        });
+      });
+    });
   });
 });
