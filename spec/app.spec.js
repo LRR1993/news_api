@@ -45,6 +45,14 @@ describe('/', () => {
             expect(topics[0]).to.have.all.keys('description', 'slug');
           });
       });
+      it('returns an error if an topic id/slug is inputted(not a topic route)', () => {
+        return request
+          .get('/api/topics/1')
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('Route Not Found');
+          });
+      });
     });
   });
 });
