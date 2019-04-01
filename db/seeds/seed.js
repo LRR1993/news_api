@@ -5,6 +5,8 @@ const {
   usersData
 } = require('../data');
 
+const { timestampFormat } = require('../../utils/utils');
+
 exports.seed = (knex, Promise) => {
   return knex.migrate
     .rollback()
@@ -15,9 +17,15 @@ exports.seed = (knex, Promise) => {
         .returning('*');
     })
     .then(topicRows => {
-      const usersInserted = knex('users')
+      const userInserted = knex('users')
         .insert(usersData)
         .returning('*');
-      return Promise.all([topicRows, usersInserted]);
+      return Promise.all([topicRows, userInserted]);
+    })
+    .then(() => {
+      const formatedArticles = timestampFormat(articlesData);
+      return knex('articles')
+        .insert(formatedArticles)
+        .returning('*');
     });
 };
