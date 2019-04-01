@@ -1,6 +1,9 @@
 process.env.NODE_ENV = 'test';
+const chai = require('chai');
+chai.use(require('chai-sorted'));
 
-const { expect } = require('chai');
+const { expect } = chai;
+
 const supertest = require('supertest');
 
 const app = require('../app');
@@ -70,6 +73,35 @@ describe('/', () => {
                 'votes',
                 'article_id'
               );
+            });
+        });
+        it('articles to be in descending order by date by default', () => {
+          return request
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.descendingBy('created_at');
+            });
+        });
+      });
+      describe('GET QUERIES', () => {
+        it('accepts a sort query, to sort by author', () => {
+          return request
+            .get('/api/articles?author=butter_bridge')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.descendingBy('author');
+              expect(
+                articles.every(article => article.author === 'butter_bridge')
+              ).to.be.true;
+            });
+        });
+        it('return an error when author does not exist', () => {
+          return request
+            .get('/api/articles?author=not_a_user')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Author: 'not_a_user' Not Found");
             });
         });
       });
