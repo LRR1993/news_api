@@ -192,7 +192,22 @@ describe('/', () => {
           });
         });
         describe('ERROR HANDLING', () => {
-          it('', () => {});
+          it('return an error when id does not exist', () => {
+            return request
+              .get('/api/articles/99999999')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("User: '99999999' Not Found");
+              });
+          });
+          it('return an error when id does not exist', () => {
+            return request
+              .get('/api/articles/notAuser')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Bad Request');
+              });
+          });
         });
       });
     });

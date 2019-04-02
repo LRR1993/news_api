@@ -33,6 +33,11 @@ exports.getArticles = ({
     .orderBy(criteria, order)
     .returning('*')
     .then(articles => {
+      if (!articles)
+        return Promise.reject({
+          status: 404,
+          msg: `User: '${article_id}' Not Found`
+        });
       if (articles.length < 1) {
         let errName = remainingQueries.author;
         if (remainingQueries.topic) errName = remainingQueries.topic;
