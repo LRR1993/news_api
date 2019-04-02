@@ -18,7 +18,7 @@ exports.getArticles = ({
       'articles.article_id'
     )
     .from('articles')
-    .join('comments', 'comments.article_id', '=', 'articles.article_id')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id')
     .modify(query => {
@@ -54,5 +54,20 @@ exports.getArticles = ({
         articles.comment_count = +articles.comment_count;
       }
       return articles;
+    });
+};
+
+exports.updateArticleProp = (prop, id) => {
+  return connection('articles')
+    .where(id)
+    .increment('votes', prop.inc_votes)
+    .returning('*')
+    .then(votes => {
+      if (!prop.inc_votes)
+        return Promise.reject({
+          status: 400,
+          msg: `Bad Request: malformed body / missing required fields`
+        });
+      return votes;
     });
 };

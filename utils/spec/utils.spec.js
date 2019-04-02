@@ -3,7 +3,8 @@ const {
   timestampFormat,
   authorFormat,
   commentRef,
-  commentFormat
+  commentFormat,
+  patchFormat
 } = require('../utils');
 
 describe('#timestampFormat', () => {

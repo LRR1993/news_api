@@ -158,7 +158,7 @@ describe('/', () => {
             .get('/api/articles?sort_by=notAColumn')
             .expect(400)
             .then(({ body: { msg } }) => {
-              expect(msg).to.equal('Bad Request');
+              expect(msg).to.equal(`Error Code: 42703`);
             });
         });
         it('returns default behavior, when order query invalid', () => {
@@ -190,6 +190,44 @@ describe('/', () => {
                 expect(article.comment_count).to.equal(13);
               });
           });
+          it('PATCHES the voyes of a article to increase the votes', () => {
+            return request
+              .patch('/api/articles/1')
+              .send({ inc_votes: 1 })
+              .expect(201)
+              .then(res => {
+                expect(res.body.article).to.eql([
+                  {
+                    article_id: 1,
+                    title: 'Living in the shadow of a great man',
+                    topic: 'mitch',
+                    author: 'butter_bridge',
+                    body: 'I find this existence challenging',
+                    created_at: '2018-11-15T12:21:54.171Z',
+                    votes: 101
+                  }
+                ]);
+              });
+          });
+          it('PATCHES the votes of a article to reduce the votes', () => {
+            return request
+              .patch('/api/articles/1')
+              .send({ inc_votes: -1 })
+              .expect(201)
+              .then(res => {
+                expect(res.body.article).to.eql([
+                  {
+                    article_id: 1,
+                    title: 'Living in the shadow of a great man',
+                    topic: 'mitch',
+                    author: 'butter_bridge',
+                    body: 'I find this existence challenging',
+                    created_at: '2018-11-15T12:21:54.171Z',
+                    votes: 99
+                  }
+                ]);
+              });
+          });
         });
         describe('ERROR HANDLING', () => {
           it('return an error when id does not exist', () => {
@@ -205,7 +243,27 @@ describe('/', () => {
               .get('/api/articles/notAuser')
               .expect(400)
               .then(({ body: { msg } }) => {
-                expect(msg).to.equal('Bad Request');
+                expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
+          it('returns and error when body is empty', () => {
+            return request
+              .patch('/api/articles/1')
+              .send({})
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad Request: malformed body / missing required fields'
+                );
+              });
+          });
+          it('returns and error when body is the wrong type', () => {
+            return request
+              .patch('/api/articles/1')
+              .send({ inc_votes: 'wrongType' })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 22P02`);
               });
           });
         });

@@ -1,4 +1,4 @@
-const { getArticles } = require('../models/articles');
+const { getArticles, updateArticleProp } = require('../models/articles');
 
 exports.sendArticles = (req, res, next) => {
   getArticles(req.query)
@@ -12,6 +12,14 @@ exports.sendArticleById = (req, res, next) => {
   getArticles(req.params)
     .then(article => {
       res.status(200).json({ article });
+    })
+    .catch(next);
+};
+
+exports.updateArticle = (req, res, next) => {
+  updateArticleProp(req.body, req.params)
+    .then(article => {
+      res.status(201).json({ article });
     })
     .catch(next);
 };
