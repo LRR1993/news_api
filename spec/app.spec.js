@@ -269,6 +269,22 @@ describe('/', () => {
                 expect(msg).to.equal(`Error Code: 22P02`);
               });
           });
+          it('return an error when id to be deleted does not exist', () => {
+            return request
+              .delete('/api/articles/99999999')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("User: '99999999' Not Found");
+              });
+          });
+          it('return an error when id does to be deleted does not exist', () => {
+            return request
+              .delete('/api/articles/notAuser')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
         });
       });
     });

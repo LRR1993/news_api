@@ -33,5 +33,5 @@ exports.deleteArticle = (req, res, next) => {
     .then(() => {
       res.status(204).end();
     })
-    .catch(console.log);
+    .catch(next);
 };

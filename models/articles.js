@@ -75,5 +75,12 @@ exports.updateArticleProp = (prop, id) => {
 exports.deleteArticleProp = id => {
   return connection('articles')
     .where(id)
-    .del();
+    .del()
+    .then(info => {
+      if (!info)
+        return Promise.reject({
+          status: 404,
+          msg: `User: '${id.article_id}' Not Found`
+        });
+    });
 };
