@@ -7,3 +7,11 @@ exports.sendArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.sendArticleById = (req, res, next) => {
+  getArticles(req.params)
+    .then(article => {
+      res.status(200).json({ article });
+    })
+    .catch(next);
+};

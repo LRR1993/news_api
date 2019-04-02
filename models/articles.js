@@ -1,8 +1,9 @@
 const connection = require('../db/connection');
 
 exports.getArticles = ({
-  sort_by: criteria = 'created_at',
+  sort_by: criteria = 'articles.created_at',
   order = 'desc',
+  article_id,
   ...remainingQueries
 }) => {
   if (order !== 'desc' && order !== 'asc') order = 'desc';
@@ -20,9 +21,11 @@ exports.getArticles = ({
     .join('comments', 'comments.article_id', '=', 'articles.article_id')
     .count('comments.article_id AS comment_count')
     .groupBy('articles.article_id')
-    .where(query => {
+    .modify(query => {
       if (remainingQueries.author) {
         query.where('articles.author', '=', remainingQueries.author);
+      } else if (article_id) {
+        query.where('articles.article_id', '=', article_id).first();
       } else {
         query.where(remainingQueries);
       }
@@ -38,9 +41,13 @@ exports.getArticles = ({
           msg: `Bad Request: '${errName}' Not Found`
         });
       }
-      articles.forEach(article => {
-        article.comment_count = +article.comment_count;
-      });
+      if (Array.isArray(articles)) {
+        articles.forEach(article => {
+          article.comment_count = +article.comment_count;
+        });
+      } else {
+        articles.comment_count = +articles.comment_count;
+      }
       return articles;
     });
 };

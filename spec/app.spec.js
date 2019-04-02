@@ -170,6 +170,31 @@ describe('/', () => {
             });
         });
       });
+      describe('/article_id', () => {
+        describe('DEFAULT BEHAVIOURS', () => {
+          it('GET returns status 200 and returns an article object', () => {
+            return request
+              .get('/api/articles/1')
+              .expect(200)
+              .then(({ body: { article } }) => {
+                expect(article).to.contain.keys(
+                  'title',
+                  'topic',
+                  'author',
+                  'body',
+                  'created_at',
+                  'votes',
+                  'article_id',
+                  'comment_count'
+                );
+                expect(article.comment_count).to.equal(13);
+              });
+          });
+        });
+        describe('ERROR HANDLING', () => {
+          it('', () => {});
+        });
+      });
     });
   });
 });
