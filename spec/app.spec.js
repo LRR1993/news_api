@@ -299,6 +299,24 @@ describe('/', () => {
             });
         });
       });
+      describe('ERROR HANDLING', () => {
+        it('return an error when id is the wrong type', () => {
+          return request
+            .get('/api/users/99999999')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(`Bad Request: '99999999' invalid input`);
+            });
+        });
+        it('return an error when id does not exist', () => {
+          return request
+            .get('/api/users/notAuser')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(`User: 'notAuser' Not Found`);
+            });
+        });
+      });
     });
   });
 });
