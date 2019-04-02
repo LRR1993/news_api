@@ -71,3 +71,9 @@ exports.updateArticleProp = (prop, id) => {
       return votes;
     });
 };
+
+exports.deleteArticleProp = id => {
+  return connection('articles')
+    .where(id)
+    .del();
+};

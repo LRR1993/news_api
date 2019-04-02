@@ -228,6 +228,9 @@ describe('/', () => {
                 ]);
               });
           });
+          it('DELETES specfic articles for the id given', () => {
+            return request.delete('/api/articles/1').expect(204);
+          });
         });
         describe('ERROR HANDLING', () => {
           it('return an error when id does not exist', () => {
