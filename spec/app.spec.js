@@ -288,5 +288,17 @@ describe('/', () => {
         });
       });
     });
+    describe('/users', () => {
+      describe('/:username', () => {
+        it('GET returns status 200 and returns an array of objects of users', () => {
+          return request
+            .get('/api/users/butter_bridge')
+            .expect(200)
+            .then(({ body: { user } }) => {
+              expect(user).to.have.all.keys('username', 'avatar_url', 'name');
+            });
+        });
+      });
+    });
   });
 });
