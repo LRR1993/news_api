@@ -14,22 +14,26 @@ const request = supertest(app);
 describe('/', () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  it('checks that if there is `/notARoute` an error is thrown', () => {
-    return request
-      .get('/notARoute')
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).to.equal('Route Not Found');
-      });
+  describe('ERROS', () => {
+    it('checks that if there is `/notARoute` an error is thrown', () => {
+      return request
+        .get('/notARoute')
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal('Route Not Found');
+        });
+    });
   });
   describe('/api', () => {
-    it('returns error when incorrect method used', () => {
-      return request
-        .post('/api')
-        .expect(405)
-        .then(({ body: { msg } }) => {
-          expect(msg).to.equal('Method Not Allowed');
-        });
+    describe('ERRORS', () => {
+      it('returns error when incorrect method used', () => {
+        return request
+          .post('/api')
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal('Method Not Allowed');
+          });
+      });
     });
     it('GET status:200', () => {
       return request
@@ -59,12 +63,12 @@ describe('/', () => {
     });
     describe('/articles', () => {
       describe('DEFAULT BEHAVIOURS', () => {
-        it('GET returns status 200 and returns an array of objects of treasures', () => {
+        it('GET returns status 200 and returns an array of objects of articles', () => {
           return request
             .get('/api/articles')
             .expect(200)
             .then(({ body: { articles } }) => {
-              expect(articles[0]).to.have.keys(
+              expect(articles[0]).to.contain.keys(
                 'title',
                 'topic',
                 'author',
@@ -73,6 +77,15 @@ describe('/', () => {
                 'votes',
                 'article_id'
               );
+            });
+        });
+        it('GET returns status 200 and returns comment count in relation to articles', () => {
+          return request
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles[0]).to.contain.keys('comment_count');
+              expect(articles[0].comment_count).to.equal(13);
             });
         });
         it('articles to be in descending order by date by default', () => {
@@ -96,14 +109,6 @@ describe('/', () => {
               ).to.be.true;
             });
         });
-        it('return an error when author does not exist', () => {
-          return request
-            .get('/api/articles?author=not_a_user')
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request: 'not_a_user' Not Found");
-            });
-        });
         it('accepts a sort query, to sort by topic', () => {
           return request
             .get('/api/articles?topic=mitch')
@@ -114,6 +119,32 @@ describe('/', () => {
                 .true;
             });
         });
+        it('articles to be in asc order by date by default', () => {
+          return request
+            .get('/api/articles?order=asc')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.ascendingBy('created_at');
+            });
+        });
+        it('accepts a sort query, to sort by votes', () => {
+          return request
+            .get('/api/articles?sort_by=votes')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.descendingBy('votes');
+            });
+        });
+      });
+      describe('ERROR HANDLING', () => {
+        it('return an error when author does not exist', () => {
+          return request
+            .get('/api/articles?author=not_a_user')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Bad Request: 'not_a_user' Not Found");
+            });
+        });
         it('return an error when topic does not exist', () => {
           return request
             .get('/api/articles?topic=notATopic')
@@ -122,12 +153,12 @@ describe('/', () => {
               expect(msg).to.equal("Bad Request: 'notATopic' Not Found");
             });
         });
-        it('articles to be in asc order by date by default', () => {
+        it('returns an error when not a valid search parameter is queired', () => {
           return request
-            .get('/api/articles?order=asc')
-            .expect(200)
-            .then(({ body: { articles } }) => {
-              expect(articles).to.be.ascendingBy('created_at');
+            .get('/api/articles?sort_by=notAColumn')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Bad Request');
             });
         });
         it('returns default behavior, when order query invalid', () => {
