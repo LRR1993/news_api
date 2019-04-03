@@ -1,7 +1,7 @@
 const commentsRouter = require('express').Router();
 const {
   deleteCommentById,
-  updateCommentById
+  updateCommentById,
 } = require('../controllers/comments');
 const { methodNotAllowed } = require('../errors');
 

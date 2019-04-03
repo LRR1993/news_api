@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 process.env.NODE_ENV = 'test';
 const chai = require('chai');
 chai.use(require('chai-sorted'));
@@ -51,7 +52,7 @@ describe('/', () => {
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal('Method Not Allowed');
               });
-          })
+          }),
         );
       });
     });
@@ -90,7 +91,7 @@ describe('/', () => {
                 .then(({ body: { msg } }) => {
                   expect(msg).to.equal('Method Not Allowed');
                 });
-            })
+            }),
           );
         });
       });
@@ -109,7 +110,7 @@ describe('/', () => {
                 'body',
                 'created_at',
                 'votes',
-                'article_id'
+                'article_id',
               );
             });
         });
@@ -139,7 +140,7 @@ describe('/', () => {
             .then(({ body: { articles } }) => {
               expect(articles).to.be.descendingBy('author');
               expect(
-                articles.every(article => article.author === 'butter_bridge')
+                articles.every(article => article.author === 'butter_bridge'),
               ).to.be.true;
             });
         });
@@ -213,7 +214,7 @@ describe('/', () => {
                   .then(({ body: { msg } }) => {
                     expect(msg).to.equal('Method Not Allowed');
                   });
-              })
+              }),
             );
           });
         });
@@ -233,7 +234,7 @@ describe('/', () => {
                   'created_at',
                   'votes',
                   'article_id',
-                  'comment_count'
+                  'comment_count',
                 );
                 expect(article.comment_count).to.equal(13);
               });
@@ -252,8 +253,8 @@ describe('/', () => {
                     author: 'butter_bridge',
                     body: 'I find this existence challenging',
                     created_at: '2018-11-15T12:21:54.171Z',
-                    votes: 101
-                  }
+                    votes: 101,
+                  },
                 ]);
               });
           });
@@ -271,8 +272,8 @@ describe('/', () => {
                     author: 'butter_bridge',
                     body: 'I find this existence challenging',
                     created_at: '2018-11-15T12:21:54.171Z',
-                    votes: 99
-                  }
+                    votes: 99,
+                  },
                 ]);
               });
           });
@@ -291,7 +292,7 @@ describe('/', () => {
                     .then(({ body: { msg } }) => {
                       expect(msg).to.equal('Method Not Allowed');
                     });
-                })
+                }),
               );
             });
           });
@@ -318,7 +319,7 @@ describe('/', () => {
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
+                  'Bad Request: malformed body / missing required fields',
                 );
               });
           });
@@ -361,7 +362,7 @@ describe('/', () => {
                   'votes',
                   'created_at',
                   'author',
-                  'body'
+                  'body',
                 );
               });
           });
@@ -380,7 +381,7 @@ describe('/', () => {
               .post('/api/articles/1/comments')
               .send({
                 username: 'butter_bridge',
-                body: 'This is awesome'
+                body: 'This is awesome',
               })
               .expect(201)
               .then(({ body: { comment } }) => {
@@ -390,7 +391,7 @@ describe('/', () => {
                   'article_id',
                   'votes',
                   'body',
-                  'created_at'
+                  'created_at',
                 );
                 expect(comment[0].author).to.equal('butter_bridge');
                 expect(comment[0].comment_id).to.equal(19);
@@ -433,7 +434,7 @@ describe('/', () => {
                   body: 'Fruit pastilles',
                   created_at: '2005-11-25T12:36:03.389Z',
                   votes: 0,
-                  comment_id: 13
+                  comment_id: 13,
                 });
                 expect(comments.slice(-1)[0]).to.eql({
                   author: 'butter_bridge',
@@ -441,7 +442,7 @@ describe('/', () => {
                     'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
                   created_at: '2016-11-22T12:36:03.389Z',
                   votes: 14,
-                  comment_id: 2
+                  comment_id: 2,
                 });
               });
           });
@@ -457,7 +458,7 @@ describe('/', () => {
                     .then(({ body: { msg } }) => {
                       expect(msg).to.equal('Method Not Allowed');
                     });
-                })
+                }),
               );
             });
           });
@@ -466,7 +467,7 @@ describe('/', () => {
               .post('/api/articles/1/comments')
               .send({
                 username: 'not_exist',
-                body: 'This is awesome'
+                body: 'This is awesome',
               })
               .expect(400)
               .then(({ body: { msg } }) => {
@@ -510,7 +511,7 @@ describe('/', () => {
               .post('/api/articles/99999999/comments')
               .send({
                 username: 'butter_bridge',
-                body: 'This is awesome'
+                body: 'This is awesome',
               })
               .expect(400)
               .then(({ body: { msg } }) => {
@@ -522,7 +523,7 @@ describe('/', () => {
               .post('/api/articles/notAuser/comments')
               .send({
                 username: 'butter_bridge',
-                body: 'This is awesome'
+                body: 'This is awesome',
               })
               .expect(400)
               .then(({ body: { msg } }) => {
@@ -536,7 +537,7 @@ describe('/', () => {
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
+                  'Bad Request: malformed body / missing required fields',
                 );
               });
           });
@@ -544,12 +545,12 @@ describe('/', () => {
             return request
               .post('/api/articles/1/comments')
               .send({
-                username: 'butter_bridge'
+                username: 'butter_bridge',
               })
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
+                  'Bad Request: malformed body / missing required fields',
                 );
               });
           });
@@ -578,7 +579,7 @@ describe('/', () => {
                   .then(({ body: { msg } }) => {
                     expect(msg).to.equal('Method Not Allowed');
                   });
-              })
+              }),
             );
           });
         });
@@ -618,8 +619,8 @@ describe('/', () => {
                 body:
                   "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
                 votes: 17,
-                created_at: '2017-11-22T12:36:03.389Z'
-              }
+                created_at: '2017-11-22T12:36:03.389Z',
+              },
             ]);
           });
       });
@@ -637,8 +638,8 @@ describe('/', () => {
                 body:
                   "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
                 votes: 15,
-                created_at: '2017-11-22T12:36:03.389Z'
-              }
+                created_at: '2017-11-22T12:36:03.389Z',
+              },
             ]);
           });
       });
@@ -653,7 +654,7 @@ describe('/', () => {
                   .then(({ body: { msg } }) => {
                     expect(msg).to.equal('Method Not Allowed');
                   });
-              })
+              }),
             );
           });
         });
@@ -680,7 +681,7 @@ describe('/', () => {
             .expect(400)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal(
-                'Bad Request: malformed body / missing required fields'
+                'Bad Request: malformed body / missing required fields',
               );
             });
         });

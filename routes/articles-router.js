@@ -5,7 +5,7 @@ const {
   updateArticle,
   deleteArticle,
   sendCommentsById,
-  addComment
+  addComment,
 } = require('../controllers/articles');
 
 const { methodNotAllowed } = require('../errors');
@@ -27,6 +27,5 @@ articlesRouter
   .get(sendCommentsById)
   .post(addComment)
   .all(methodNotAllowed);
-
 
 module.exports = articlesRouter;

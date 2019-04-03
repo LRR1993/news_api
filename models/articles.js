@@ -15,7 +15,7 @@ exports.getArticles = ({
       'articles.body',
       'articles.created_at',
       'articles.votes',
-      'articles.article_id'
+      'articles.article_id',
     )
     .from('articles')
     .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
@@ -36,14 +36,14 @@ exports.getArticles = ({
       if (!articles)
         return Promise.reject({
           status: 404,
-          msg: `User: '${article_id}' Not Found`
+          msg: `User: '${article_id}' Not Found`,
         });
       if (articles.length < 1) {
         let errName = remainingQueries.author;
         if (remainingQueries.topic) errName = remainingQueries.topic;
         return Promise.reject({
           status: 400,
-          msg: `Bad Request: '${errName}' Not Found`
+          msg: `Bad Request: '${errName}' Not Found`,
         });
       }
       if (Array.isArray(articles)) {
@@ -66,7 +66,7 @@ exports.updateArticleProp = (prop, id) => {
       if (!prop.inc_votes)
         return Promise.reject({
           status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
+          msg: 'Bad Request: malformed body / missing required fields',
         });
       return votes;
     });
@@ -80,7 +80,7 @@ exports.deleteArticleProp = id => {
       if (!info)
         return Promise.reject({
           status: 404,
-          msg: `User: '${id.article_id}' Not Found`
+          msg: `User: '${id.article_id}' Not Found`,
         });
     });
 };
@@ -91,7 +91,7 @@ exports.getComments = (
     order = 'desc',
     ...remainingQueries
   },
-  id
+  id,
 ) => {
   if (order !== 'desc' && order !== 'asc') order = 'desc';
   return connection
@@ -101,7 +101,7 @@ exports.getComments = (
       'comments.created_at',
       'comments.votes',
       'comment_id',
-      'comments.body'
+      'comments.body',
     )
     .from('comments')
     .leftJoin('articles', 'comments.article_id', '=', 'articles.article_id')
@@ -118,7 +118,7 @@ exports.getComments = (
       if (comments.length < 1)
         return Promise.reject({
           status: 404,
-          msg: `User: '${id.article_id}' Not Found`
+          msg: `User: '${id.article_id}' Not Found`,
         });
       return comments;
     });
@@ -128,7 +128,7 @@ exports.makeComment = ({ username, ...remainingBody }, id) => {
   const formattedBody = {
     author: username,
     article_id: id.article_id,
-    ...remainingBody
+    ...remainingBody,
   };
   return connection('comments')
     .insert(formattedBody)
@@ -137,7 +137,7 @@ exports.makeComment = ({ username, ...remainingBody }, id) => {
       if (!comment[0].author || !comment[0].body)
         return Promise.reject({
           status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
+          msg: 'Bad Request: malformed body / missing required fields',
         });
       return comment;
     });

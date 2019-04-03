@@ -8,7 +8,7 @@ exports.deleteCommentEntry = id => {
       if (!info)
         return Promise.reject({
           status: 404,
-          msg: `Comment id: '${id.comment_id}' Not Found`
+          msg: `Comment id: '${id.comment_id}' Not Found`,
         });
     });
 };
@@ -22,7 +22,7 @@ exports.updateCommentEntry = (prop, id) => {
       if (!prop.inc_votes)
         return Promise.reject({
           status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
+          msg: 'Bad Request: malformed body / missing required fields',
         });
       return votes;
     });
