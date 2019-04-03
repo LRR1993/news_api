@@ -2,14 +2,14 @@ const {
   articlesData,
   commentsData,
   topicsData,
-  usersData,
+  usersData
 } = require('../data');
 
 const {
   timestampFormat,
   commentRef,
   authorFormat,
-  commentFormat,
+  commentFormat
 } = require('../../utils/utils');
 
 exports.seed = (knex, Promise) => {

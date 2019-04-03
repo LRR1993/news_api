@@ -4,7 +4,7 @@ const {
   routeNotFound,
   handle500,
   handleCustomErrors,
-  handlePsqlErrors,
+  handlePsqlErrors
 } = require('./errors');
 
 const app = express();

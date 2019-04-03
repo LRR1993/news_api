@@ -4,7 +4,7 @@ const {
   authorFormat,
   commentRef,
   commentFormat,
-  patchFormat,
+  patchFormat
 } = require('../utils');
 
 describe('#timestampFormat', () => {
@@ -20,8 +20,8 @@ describe('#timestampFormat', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: 1542284514171,
-        votes: 100,
-      },
+        votes: 100
+      }
     ];
     const output = [
       {
@@ -30,8 +30,8 @@ describe('#timestampFormat', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: '2018-11-15T12:21:54.171Z',
-        votes: 100,
-      },
+        votes: 100
+      }
     ];
     expect(timestampFormat(input)).to.eql(output);
   });
@@ -43,15 +43,15 @@ describe('#timestampFormat', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: 1542284514171,
-        votes: 100,
+        votes: 100
       },
       {
         title: 'Eight pug gifs that remind me of mitch',
         topic: 'mitch',
         author: 'icellusedkars',
         body: 'some gifs',
-        created_at: 1289996514171,
-      },
+        created_at: 1289996514171
+      }
     ];
     const output = [
       {
@@ -60,15 +60,15 @@ describe('#timestampFormat', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: '2018-11-15T12:21:54.171Z',
-        votes: 100,
+        votes: 100
       },
       {
         title: 'Eight pug gifs that remind me of mitch',
         topic: 'mitch',
         author: 'icellusedkars',
         body: 'some gifs',
-        created_at: '2010-11-17T12:21:54.171Z',
-      },
+        created_at: '2010-11-17T12:21:54.171Z'
+      }
     ];
     expect(timestampFormat(input)).to.eql(output);
   });
@@ -86,8 +86,8 @@ describe('#authorFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
-      },
+        created_at: 1511354163389
+      }
     ];
     const output = [
       {
@@ -96,8 +96,8 @@ describe('#authorFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         author: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
-      },
+        created_at: 1511354163389
+      }
     ];
     expect(authorFormat(input)).to.eql(output);
   });
@@ -109,7 +109,7 @@ describe('#authorFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
+        created_at: 1511354163389
       },
       {
         body:
@@ -117,7 +117,7 @@ describe('#authorFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         created_by: 'butter_bridge',
         votes: 14,
-        created_at: 1479818163389,
+        created_at: 1479818163389
       },
       {
         body:
@@ -125,8 +125,8 @@ describe('#authorFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         created_by: 'icellusedkars',
         votes: 100,
-        created_at: 1448282163389,
-      },
+        created_at: 1448282163389
+      }
     ];
     const output = [
       {
@@ -135,7 +135,7 @@ describe('#authorFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         author: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
+        created_at: 1511354163389
       },
       {
         body:
@@ -143,7 +143,7 @@ describe('#authorFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         author: 'butter_bridge',
         votes: 14,
-        created_at: 1479818163389,
+        created_at: 1479818163389
       },
       {
         body:
@@ -151,8 +151,8 @@ describe('#authorFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         author: 'icellusedkars',
         votes: 100,
-        created_at: 1448282163389,
-      },
+        created_at: 1448282163389
+      }
     ];
     expect(authorFormat(input)).to.eql(output);
   });
@@ -171,11 +171,11 @@ describe('#commentRef', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: 1542284514171,
-        votes: 100,
-      },
+        votes: 100
+      }
     ];
     const output = {
-      'Living in the shadow of a great man': 1,
+      'Living in the shadow of a great man': 1
     };
     expect(commentRef(input)).to.eql(output);
   });
@@ -188,7 +188,7 @@ describe('#commentRef', () => {
         author: 'butter_bridge',
         body: 'I find this existence challenging',
         created_at: 1542284514171,
-        votes: 100,
+        votes: 100
       },
       {
         article_id: 2,
@@ -196,7 +196,7 @@ describe('#commentRef', () => {
         topic: 'mitch',
         author: 'icellusedkars',
         body: 'some gifs',
-        created_at: 1289996514171,
+        created_at: 1289996514171
       },
       {
         article_id: 3,
@@ -205,13 +205,13 @@ describe('#commentRef', () => {
         author: 'rogersop',
         body:
           'We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages',
-        created_at: 1163852514171,
-      },
+        created_at: 1163852514171
+      }
     ];
     const output = {
       'Living in the shadow of a great man': 1,
       'Eight pug gifs that remind me of mitch': 2,
-      'Student SUES Mitch!': 3,
+      'Student SUES Mitch!': 3
     };
     expect(commentRef(input)).to.eql(output);
   });
@@ -219,7 +219,7 @@ describe('#commentRef', () => {
 describe('#commentFormat', () => {
   it('returns correct format for comments schema for an array length of 1', () => {
     const lookup = {
-      "They're not exactly dogs, are they?": 1,
+      "They're not exactly dogs, are they?": 1
     };
     const data = [
       {
@@ -228,8 +228,8 @@ describe('#commentFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
-      },
+        created_at: 1511354163389
+      }
     ];
     const output = [
       {
@@ -238,15 +238,15 @@ describe('#commentFormat', () => {
         article_id: 1,
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
-      },
+        created_at: 1511354163389
+      }
     ];
     expect(commentFormat(lookup, data)).to.eql(output);
   });
   it('returns correct format for shop schema for an array', () => {
     const lookup = {
       "They're not exactly dogs, are they?": 1,
-      'Living in the shadow of a great man': 2,
+      'Living in the shadow of a great man': 2
     };
     const output = [
       {
@@ -255,7 +255,7 @@ describe('#commentFormat', () => {
         article_id: 1,
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
+        created_at: 1511354163389
       },
       {
         body:
@@ -263,7 +263,7 @@ describe('#commentFormat', () => {
         article_id: 2,
         created_by: 'butter_bridge',
         votes: 14,
-        created_at: 1479818163389,
+        created_at: 1479818163389
       },
       {
         body:
@@ -271,8 +271,8 @@ describe('#commentFormat', () => {
         article_id: 2,
         created_by: 'icellusedkars',
         votes: 100,
-        created_at: 1448282163389,
-      },
+        created_at: 1448282163389
+      }
     ];
     const data = [
       {
@@ -281,7 +281,7 @@ describe('#commentFormat', () => {
         belongs_to: "They're not exactly dogs, are they?",
         created_by: 'butter_bridge',
         votes: 16,
-        created_at: 1511354163389,
+        created_at: 1511354163389
       },
       {
         body:
@@ -289,7 +289,7 @@ describe('#commentFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         created_by: 'butter_bridge',
         votes: 14,
-        created_at: 1479818163389,
+        created_at: 1479818163389
       },
       {
         body:
@@ -297,8 +297,8 @@ describe('#commentFormat', () => {
         belongs_to: 'Living in the shadow of a great man',
         created_by: 'icellusedkars',
         votes: 100,
-        created_at: 1448282163389,
-      },
+        created_at: 1448282163389
+      }
     ];
     expect(commentFormat(lookup, data)).to.eql(output);
   });

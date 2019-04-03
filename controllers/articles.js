@@ -3,7 +3,7 @@ const {
   updateArticleProp,
   deleteArticleProp,
   getComments,
-  makeComment,
+  makeComment
 } = require('../models/articles');
 
 exports.sendArticles = (req, res, next) => {

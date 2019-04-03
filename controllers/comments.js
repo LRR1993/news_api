@@ -1,6 +1,6 @@
 const {
   deleteCommentEntry,
-  updateCommentEntry,
+  updateCommentEntry
 } = require('../models/comments');
 
 exports.deleteCommentById = (req, res, next) => {

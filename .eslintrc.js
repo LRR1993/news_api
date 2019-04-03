@@ -25,6 +25,16 @@ module.exports = {
   },
   plugins: ['react', 'prettier'],
   rules: {
+    'comma-dangle': [
+      'error',
+      {
+        arrays: 'never',
+        objects: 'ignore',
+        imports: 'never',
+        exports: 'never',
+        functions: 'ignore',
+      },
+    ],
     'no-restricted-globals': 1,
     'consistent-return': 0,
     camelcase: 0,

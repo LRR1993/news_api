@@ -5,7 +5,7 @@ const {
   updateArticle,
   deleteArticle,
   sendCommentsById,
-  addComment,
+  addComment
 } = require('../controllers/articles');
 
 const { methodNotAllowed } = require('../errors');
