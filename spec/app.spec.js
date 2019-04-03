@@ -31,7 +31,18 @@ describe('/', () => {
         .get('/api')
         .expect(200)
         .then(({ body }) => {
-          expect(body.ok).to.equal(true);
+          expect(body).to.eql({
+            topics: 'shows a list of topics',
+            articles: {
+              id: 'shows a specfic article',
+              article_id: {
+                coments: 'show or add new a new comment for an article'
+              }
+            },
+            comments:
+              'update or delete a specfic comment relation to an article',
+            users: 'shows all users'
+          });
         });
     });
     describe('ERRORS', () => {
