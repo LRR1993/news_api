@@ -25,6 +25,14 @@ describe('/', () => {
     });
   });
   describe('/api', () => {
+    it('GET status:200', () => {
+      return request
+        .get('/api')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.ok).to.equal(true);
+        });
+    });
     describe('ERRORS', () => {
       it('returns error when incorrect method used', () => {
         return request
@@ -34,14 +42,6 @@ describe('/', () => {
             expect(msg).to.equal('Method Not Allowed');
           });
       });
-    });
-    it('GET status:200', () => {
-      return request
-        .get('/api')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.ok).to.equal(true);
-        });
     });
     describe('/topics', () => {
       it('GET returns status 200 and returns an array of objects of topics', () => {
@@ -508,6 +508,49 @@ describe('/', () => {
               expect(msg).to.equal(`User: 'notAuser' Not Found`);
             });
         });
+      });
+    });
+    describe.only('/comments', () => {
+      it('deletes a comment for a given comment id', () => {
+        return request.delete('/api/comments/1').expect(204);
+      });
+      it('PATCHES the votes of a comments to increase the votes', () => {
+        return request
+          .patch('/api/comments/1')
+          .send({ inc_votes: 1 })
+          .expect(201)
+          .then(res => {
+            expect(res.body.comment).to.eql([
+              {
+                comment_id: 1,
+                article_id: 9,
+                author: 'butter_bridge',
+                body:
+                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                votes: 17,
+                created_at: '2017-11-22T12:36:03.389Z'
+              }
+            ]);
+          });
+      });
+      it('PATCHES the votes of a article to reduce the votes', () => {
+        return request
+          .patch('/api/comments/1')
+          .send({ inc_votes: -1 })
+          .expect(201)
+          .then(res => {
+            expect(res.body.comment).to.eql([
+              {
+                comment_id: 1,
+                article_id: 9,
+                author: 'butter_bridge',
+                body:
+                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                votes: 15,
+                created_at: '2017-11-22T12:36:03.389Z'
+              }
+            ]);
+          });
       });
     });
   });
