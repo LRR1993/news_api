@@ -14,7 +14,7 @@ const request = supertest(app);
 describe('/', () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  describe('ERROS', () => {
+  describe('ERRORS', () => {
     it('checks that if there is `/notARoute` an error is thrown', () => {
       return request
         .get('/notARoute')
@@ -34,13 +34,25 @@ describe('/', () => {
         });
     });
     describe('ERRORS', () => {
-      it('returns error when incorrect method used', () => {
+      it('checks that if there is `/notARoute` an error is thrown', () => {
         return request
-          .post('/api')
-          .expect(405)
+          .get('/api/notARoute')
+          .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Method Not Allowed');
+            expect(msg).to.equal('Route Not Found');
           });
+      });
+      it('returns error when incorrect method used', () => {
+        const notMethods = ['delete', 'put', 'patch', 'post'];
+        return Promise.all(
+          notMethods.map(method => {
+            return request[method]('/api')
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal('Method Not Allowed');
+              });
+          })
+        );
       });
     });
     describe('/topics', () => {
@@ -59,6 +71,28 @@ describe('/', () => {
           .then(({ body: { msg } }) => {
             expect(msg).to.equal('Route Not Found');
           });
+      });
+      describe('ERRORS', () => {
+        it('checks that if there is `/notARoute` an error is thrown', () => {
+          return request
+            .get('/api/topics/notARoute')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Route Not Found');
+            });
+        });
+        it('returns error when incorrect method used', () => {
+          const notMethods = ['delete', 'put', 'patch', 'post'];
+          return Promise.all(
+            notMethods.map(method => {
+              return request[method]('/api/topics')
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal('Method Not Allowed');
+                });
+            })
+          );
+        });
       });
     });
     describe('/articles', () => {
@@ -169,6 +203,20 @@ describe('/', () => {
               expect(articles).to.be.descendingBy('created_at');
             });
         });
+        describe('ERRORS-Route Methods', () => {
+          it('returns error when incorrect method used', () => {
+            const notMethods = ['delete', 'put', 'patch', 'post'];
+            return Promise.all(
+              notMethods.map(method => {
+                return request[method]('/api/articles')
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal('Method Not Allowed');
+                  });
+              })
+            );
+          });
+        });
       });
       describe('/article_id', () => {
         describe('DEFAULT BEHAVIOURS', () => {
@@ -233,6 +281,20 @@ describe('/', () => {
           });
         });
         describe('ERROR HANDLING', () => {
+          describe('ERRORS-Route Methods', () => {
+            it('returns error when incorrect method used', () => {
+              const notMethods = ['put', 'post'];
+              return Promise.all(
+                notMethods.map(method => {
+                  return request[method]('/api/articles/1')
+                    .expect(405)
+                    .then(({ body: { msg } }) => {
+                      expect(msg).to.equal('Method Not Allowed');
+                    });
+                })
+              );
+            });
+          });
           it('return an error when id does not exist', () => {
             return request
               .get('/api/articles/99999999')
@@ -385,6 +447,20 @@ describe('/', () => {
           });
         });
         describe('ERROR HANDLING', () => {
+          describe('ERRORS-Route Methods', () => {
+            it('returns error when incorrect method used', () => {
+              const notMethods = ['delete', 'put', 'patch'];
+              return Promise.all(
+                notMethods.map(method => {
+                  return request[method]('/api/articles/1/comments')
+                    .expect(405)
+                    .then(({ body: { msg } }) => {
+                      expect(msg).to.equal('Method Not Allowed');
+                    });
+                })
+              );
+            });
+          });
           it('cant post a comment for a user that doesnt exist', () => {
             return request
               .post('/api/articles/1/comments')
@@ -492,6 +568,20 @@ describe('/', () => {
         });
       });
       describe('ERROR HANDLING', () => {
+        describe('ERRORS-Route Methods', () => {
+          it('returns error when incorrect method used', () => {
+            const notMethods = ['delete', 'put', 'patch', 'post'];
+            return Promise.all(
+              notMethods.map(method => {
+                return request[method]('/api/users/1')
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal('Method Not Allowed');
+                  });
+              })
+            );
+          });
+        });
         it('return an error when id is the wrong type', () => {
           return request
             .get('/api/users/99999999')
@@ -510,7 +600,7 @@ describe('/', () => {
         });
       });
     });
-    describe.only('/comments', () => {
+    describe('/comments', () => {
       it('deletes a comment for a given comment id', () => {
         return request.delete('/api/comments/1').expect(204);
       });
@@ -553,6 +643,20 @@ describe('/', () => {
           });
       });
       describe('ERROR HANDLING', () => {
+        describe('ERRORS-Route Methods', () => {
+          it('returns error when incorrect method used', () => {
+            const notMethods = ['get', 'put', 'post'];
+            return Promise.all(
+              notMethods.map(method => {
+                return request[method]('/api/comments/1')
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal('Method Not Allowed');
+                  });
+              })
+            );
+          });
+        });
         it('return an error when id to be deleted does not exist', () => {
           return request
             .delete('/api/comments/99999999')

@@ -8,17 +8,25 @@ const {
   addComment
 } = require('../controllers/articles');
 
-articlesRouter.route('/').get(sendArticles);
+const { methodNotAllowed } = require('../errors');
+
+articlesRouter
+  .route('/')
+  .get(sendArticles)
+  .all(methodNotAllowed);
 
 articlesRouter
   .route('/:article_id')
   .get(sendArticleById)
   .patch(updateArticle)
-  .delete(deleteArticle);
+  .delete(deleteArticle)
+  .all(methodNotAllowed);
 
 articlesRouter
   .route('/:article_id/comments')
   .get(sendCommentsById)
-  .post(addComment);
+  .post(addComment)
+  .all(methodNotAllowed);
+
 
 module.exports = articlesRouter;
