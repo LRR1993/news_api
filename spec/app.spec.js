@@ -190,7 +190,7 @@ describe('/', () => {
                 expect(article.comment_count).to.equal(13);
               });
           });
-          it('PATCHES the voyes of a article to increase the votes', () => {
+          it('PATCHES the votes of a article to increase the votes', () => {
             return request
               .patch('/api/articles/1')
               .send({ inc_votes: 1 })
@@ -564,6 +564,26 @@ describe('/', () => {
         it('return an error when id does to be deleted does not exist', () => {
           return request
             .delete('/api/comments/notACommentId')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(`Error Code: 22P02`);
+            });
+        });
+        it('returns and error when body is empty', () => {
+          return request
+            .patch('/api/comments/1')
+            .send({})
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(
+                'Bad Request: malformed body / missing required fields'
+              );
+            });
+        });
+        it('returns and error when body is the wrong type', () => {
+          return request
+            .patch('/api/comments/1')
+            .send({ inc_votes: 'wrongType' })
             .expect(400)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal(`Error Code: 22P02`);
