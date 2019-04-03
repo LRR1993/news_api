@@ -287,20 +287,81 @@ describe('/', () => {
           });
         });
       });
-      describe.only('/comments', () => {
-        it('GET returns status 200 and returns an array of objects of comments', () => {
-          return request
-            .get('/api/articles/1/comments')
-            .expect(200)
-            .then(({ body: { comments } }) => {
-              expect(comments[0]).to.have.all.keys(
-                'comment_id',
-                'votes',
-                'created_at',
-                'author',
-                'body'
-              );
-            });
+      describe('/comments', () => {
+        describe('DEFAULTS', () => {
+          it('GET returns status 200 and returns an array of objects of comments', () => {
+            return request
+              .get('/api/articles/1/comments')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments[0]).to.have.all.keys(
+                  'comment_id',
+                  'votes',
+                  'created_at',
+                  'author',
+                  'body'
+                );
+              });
+          });
+          it('comments are ordered to be descedning by created_at', () => {
+            return request
+              .get('/api/articles/1/comments')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.descendingBy('created_at');
+              });
+          });
+        });
+        describe.only('GET QUERIES', () => {
+          it('can set the order to be ascending by created_at', () => {
+            return request
+              .get('/api/articles/1/comments?order=asc')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.ascendingBy('created_at');
+              });
+          });
+          it('can sort by votes(defaults to descending order)', () => {
+            return request
+              .get('/api/articles/1/comments?sort_by=votes')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.descendingBy('votes');
+              });
+          });
+          it('can sort by comment_id(defaults to descending order)', () => {
+            return request
+              .get('/api/articles/1/comments?sort_by=comment_id')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.descendingBy('comment_id');
+              });
+          });
+          it('can sort by author(defaults to descending order)', () => {
+            return request
+              .get('/api/articles/1/comments?sort_by=author')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments[0]).to.be.eql({
+                  author: 'icellusedkars',
+                  body: 'Fruit pastilles',
+                  created_at: '2005-11-25T12:36:03.389Z',
+                  votes: 0,
+                  comment_id: 13
+                });
+                expect(comments.slice(-1)[0]).to.eql({
+                  author: 'butter_bridge',
+                  body:
+                    'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+                  created_at: '2016-11-22T12:36:03.389Z',
+                  votes: 14,
+                  comment_id: 2
+                });
+              });
+          });
+        });
+        describe('ERROR HANDLING', () => {
+          it('', () => {});
         });
       });
     });

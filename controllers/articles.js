@@ -38,7 +38,7 @@ exports.deleteArticle = (req, res, next) => {
 };
 
 exports.sendCommentsById = (req, res, next) => {
-  getComments(req.params)
+  getComments(req.query, req.params)
     .then(comments => {
       res.status(200).json({ comments });
     })

@@ -85,7 +85,14 @@ exports.deleteArticleProp = id => {
     });
 };
 
-exports.getComments = id => {
+exports.getComments = (
+  {
+    sort_by: criteria = 'comments.created_at',
+    order = 'desc',
+    ...remainingQueries
+  },
+  id
+) => {
   return connection
     .select(
       'comments.author',
@@ -98,8 +105,13 @@ exports.getComments = id => {
     .from('comments')
     .leftJoin('articles', 'comments.article_id', '=', 'articles.article_id')
     .modify(query => {
-      if (id) query.where('articles.article_id', '=', id.article_id);
+      if (id) {
+        query.where('articles.article_id', '=', id.article_id);
+      } else {
+        query.where(remainingQueries);
+      }
     })
+    .orderBy(criteria, order)
     .returning('*')
     .then(comments => {
       return comments;
