@@ -93,6 +93,7 @@ exports.getComments = (
   },
   id
 ) => {
+  if (order !== 'desc' && order !== 'asc') order = 'desc';
   return connection
     .select(
       'comments.author',
@@ -114,6 +115,11 @@ exports.getComments = (
     .orderBy(criteria, order)
     .returning('*')
     .then(comments => {
+      if (comments.length < 1)
+        return Promise.reject({
+          status: 404,
+          msg: `User: '${id.article_id}' Not Found`
+        });
       return comments;
     });
 };

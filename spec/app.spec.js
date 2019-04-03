@@ -312,7 +312,7 @@ describe('/', () => {
               });
           });
         });
-        describe.only('GET QUERIES', () => {
+        describe('GET QUERIES', () => {
           it('can set the order to be ascending by created_at', () => {
             return request
               .get('/api/articles/1/comments?order=asc')
@@ -360,8 +360,39 @@ describe('/', () => {
               });
           });
         });
-        describe('ERROR HANDLING', () => {
-          it('', () => {});
+        describe.only('ERROR HANDLING', () => {
+          it('returns an error when not a valid search parameter is queired', () => {
+            return request
+              .get('/api/articles/1/comments?sort_by=notAColumn')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 42703`);
+              });
+          });
+          it('returns default behavior, when order query invalid', () => {
+            return request
+              .get('/api/articles/1/comments?order=notADirection')
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.be.descendingBy('created_at');
+              });
+          });
+          it('return an error when id does not exist', () => {
+            return request
+              .get('/api/articles/99999999/comments')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("User: '99999999' Not Found");
+              });
+          });
+          it('return an error when id does not exist', () => {
+            return request
+              .get('/api/articles/notAuser/comments')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
         });
       });
     });
