@@ -84,3 +84,24 @@ exports.deleteArticleProp = id => {
         });
     });
 };
+
+exports.getComments = id => {
+  return connection
+    .select(
+      'comments.author',
+      'comments.body',
+      'comments.created_at',
+      'comments.votes',
+      'comment_id',
+      'comments.body'
+    )
+    .from('comments')
+    .leftJoin('articles', 'comments.article_id', '=', 'articles.article_id')
+    .modify(query => {
+      if (id) query.where('articles.article_id', '=', id.article_id);
+    })
+    .returning('*')
+    .then(comments => {
+      return comments;
+    });
+};

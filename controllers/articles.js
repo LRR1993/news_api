@@ -1,7 +1,8 @@
 const {
   getArticles,
   updateArticleProp,
-  deleteArticleProp
+  deleteArticleProp,
+  getComments
 } = require('../models/articles');
 
 exports.sendArticles = (req, res, next) => {
@@ -32,6 +33,14 @@ exports.deleteArticle = (req, res, next) => {
   deleteArticleProp(req.params)
     .then(() => {
       res.status(204).end();
+    })
+    .catch(next);
+};
+
+exports.sendCommentsById = (req, res, next) => {
+  getComments(req.params)
+    .then(comments => {
+      res.status(200).json({ comments });
     })
     .catch(next);
 };

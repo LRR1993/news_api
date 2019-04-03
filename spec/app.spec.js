@@ -287,6 +287,22 @@ describe('/', () => {
           });
         });
       });
+      describe.only('/comments', () => {
+        it('GET returns status 200 and returns an array of objects of comments', () => {
+          return request
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments[0]).to.have.all.keys(
+                'comment_id',
+                'votes',
+                'created_at',
+                'author',
+                'body'
+              );
+            });
+        });
+      });
     });
     describe('/users', () => {
       describe('/:username', () => {
