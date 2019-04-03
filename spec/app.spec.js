@@ -312,6 +312,30 @@ describe('/', () => {
               });
           });
         });
+        describe('POST', () => {
+          it('posts a new comment to the corresponding article id', () => {
+            return request
+              .post('/api/articles/1/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is awesome'
+              })
+              .expect(201)
+              .then(({ body: { comment } }) => {
+                expect(comment[0]).to.have.keys(
+                  'comment_id',
+                  'author',
+                  'article_id',
+                  'votes',
+                  'body',
+                  'created_at'
+                );
+                expect(comment[0].author).to.equal('butter_bridge');
+                expect(comment[0].comment_id).to.equal(19);
+                expect(comment[0].body).to.equal('This is awesome');
+              });
+          });
+        });
         describe('GET QUERIES', () => {
           it('can set the order to be ascending by created_at', () => {
             return request
@@ -360,7 +384,19 @@ describe('/', () => {
               });
           });
         });
-        describe.only('ERROR HANDLING', () => {
+        describe('ERROR HANDLING', () => {
+          it('cant post a comment for a user that doesnt exist', () => {
+            return request
+              .post('/api/articles/1/comments')
+              .send({
+                username: 'not_exist',
+                body: 'This is awesome'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.eql('Error Code: 23503');
+              });
+          });
           it('returns an error when not a valid search parameter is queired', () => {
             return request
               .get('/api/articles/1/comments?sort_by=notAColumn')
@@ -391,6 +427,54 @@ describe('/', () => {
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
+          it('cant post to an id that doesnt exist, returns an error', () => {
+            return request
+              .post('/api/articles/99999999/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is awesome'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 23503`);
+              });
+          });
+          it('cant post to an id of the wrong type, returns', () => {
+            return request
+              .post('/api/articles/notAuser/comments')
+              .send({
+                username: 'butter_bridge',
+                body: 'This is awesome'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
+          it('returns and error when body is empty', () => {
+            return request
+              .post('/api/articles/1/comments')
+              .send({})
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad Request: malformed body / missing required fields'
+                );
+              });
+          });
+          it('returns and error when body isnt given', () => {
+            return request
+              .post('/api/articles/1/comments')
+              .send({
+                username: 'butter_bridge'
+              })
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(
+                  'Bad Request: malformed body / missing required fields'
+                );
               });
           });
         });

@@ -66,7 +66,7 @@ exports.updateArticleProp = (prop, id) => {
       if (!prop.inc_votes)
         return Promise.reject({
           status: 400,
-          msg: `Bad Request: malformed body / missing required fields`
+          msg: 'Bad Request: malformed body / missing required fields'
         });
       return votes;
     });
@@ -121,5 +121,24 @@ exports.getComments = (
           msg: `User: '${id.article_id}' Not Found`
         });
       return comments;
+    });
+};
+
+exports.makeComment = ({ username, ...remainingBody }, id) => {
+  const formattedBody = {
+    author: username,
+    article_id: id.article_id,
+    ...remainingBody
+  };
+  return connection('comments')
+    .insert(formattedBody)
+    .returning('*')
+    .then(comment => {
+      if (!comment[0].author || !comment[0].body)
+        return Promise.reject({
+          status: 400,
+          msg: 'Bad Request: malformed body / missing required fields'
+        });
+      return comment;
     });
 };

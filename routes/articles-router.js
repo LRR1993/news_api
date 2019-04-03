@@ -4,7 +4,8 @@ const {
   sendArticleById,
   updateArticle,
   deleteArticle,
-  sendCommentsById
+  sendCommentsById,
+  addComment
 } = require('../controllers/articles');
 
 articlesRouter.route('/').get(sendArticles);
@@ -15,6 +16,9 @@ articlesRouter
   .patch(updateArticle)
   .delete(deleteArticle);
 
-articlesRouter.route('/:article_id/comments').get(sendCommentsById);
+articlesRouter
+  .route('/:article_id/comments')
+  .get(sendCommentsById)
+  .post(addComment);
 
 module.exports = articlesRouter;

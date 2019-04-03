@@ -2,7 +2,8 @@ const {
   getArticles,
   updateArticleProp,
   deleteArticleProp,
-  getComments
+  getComments,
+  makeComment
 } = require('../models/articles');
 
 exports.sendArticles = (req, res, next) => {
@@ -41,6 +42,14 @@ exports.sendCommentsById = (req, res, next) => {
   getComments(req.query, req.params)
     .then(comments => {
       res.status(200).json({ comments });
+    })
+    .catch(next);
+};
+
+exports.addComment = (req, res, next) => {
+  makeComment(req.body, req.params)
+    .then(comment => {
+      res.status(201).json({ comment });
     })
     .catch(next);
 };
