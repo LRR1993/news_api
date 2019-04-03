@@ -8,7 +8,7 @@ exports.deleteCommentEntry = id => {
       if (!info)
         return Promise.reject({
           status: 404,
-          msg: `Comment: '${id.comment_id}' Not Found`
+          msg: `Comment id: '${id.comment_id}' Not Found`
         });
     });
 };

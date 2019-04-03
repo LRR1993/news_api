@@ -552,6 +552,24 @@ describe('/', () => {
             ]);
           });
       });
+      describe('ERROR HANDLING', () => {
+        it('return an error when id to be deleted does not exist', () => {
+          return request
+            .delete('/api/comments/99999999')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Comment id: '99999999' Not Found");
+            });
+        });
+        it('return an error when id does to be deleted does not exist', () => {
+          return request
+            .delete('/api/comments/notACommentId')
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal(`Error Code: 22P02`);
+            });
+        });
+      });
     });
   });
 });
