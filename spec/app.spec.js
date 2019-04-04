@@ -125,7 +125,7 @@ describe('/', () => {
               );
             });
         });
-        it.only('display the total number of articles with any filters applied, discounting the limit', () => {
+        it.skip('display the total number of articles with any filters applied, discounting the limit', () => {
           return request
             .get('/api/articles')
             .expect(200)
@@ -289,6 +289,14 @@ describe('/', () => {
               expect(articles.length).to.be.below(11);
             });
         });
+        it.only('returns empty array when page number out of range if articles', () => {
+          return request
+            .get('/api/articles?p=5')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.be.eql([]);
+            });
+        });
         it('defaults to articles limit of 10, when invalid query entered', () => {
           return request
             .get('/api/articles?limit=notanum')
@@ -305,20 +313,20 @@ describe('/', () => {
               expect(articles.length).to.be.below(11);
             });
         });
-        it('return an error when author does not exist', () => {
+        it('return an empty array when author does not exist', () => {
           return request
             .get('/api/articles?author=not_a_user')
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request: 'not_a_user' Not Found");
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.eql([]);
             });
         });
-        it('return an error when topic does not exist', () => {
+        it('return an empty array when topic does not exist', () => {
           return request
             .get('/api/articles?topic=notATopic')
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal("Bad Request: 'notATopic' Not Found");
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles).to.eql([]);
             });
         });
         it('returns an error when not a valid search parameter is queired', () => {
@@ -626,9 +634,9 @@ describe('/', () => {
           it('return an error when id does not exist', () => {
             return request
               .get('/api/articles/99999999/comments')
-              .expect(404)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal("User: '99999999' Not Found");
+              .expect(200)
+              .then(({ body: { comments } }) => {
+                expect(comments).to.eql([]);
               });
           });
           it('return an error when id does not exist', () => {

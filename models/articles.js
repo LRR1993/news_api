@@ -46,14 +46,6 @@ exports.getArticles = ({
             status: 404,
             msg: `User: '${article_id}' Not Found`
           });
-        if (articles.length < 1) {
-          let errName = remainingQueries.author;
-          if (remainingQueries.topic) errName = remainingQueries.topic;
-          return Promise.reject({
-            status: 400,
-            msg: `Bad Request: '${errName}' Not Found`
-          });
-        }
         if (Array.isArray(articles)) {
           articles.forEach(article => {
             article.comment_count = +article.comment_count;
@@ -122,15 +114,7 @@ exports.getComments = (
       }
     })
     .orderBy(criteria, order)
-    .returning('*')
-    .then(comments => {
-      if (comments.length < 1)
-        return Promise.reject({
-          status: 404,
-          msg: `User: '${id.article_id}' Not Found`
-        });
-      return comments;
-    });
+    .returning('*');
 };
 
 exports.makeComment = ({ username, ...remainingBody }, id) => {
