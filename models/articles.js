@@ -11,51 +11,65 @@ exports.getArticles = ({
   if (isNaN(limit) || limit < 0) limit = 10;
   if (isNaN(p) || p < 0) p = 1;
   if (order !== 'desc' && order !== 'asc') order = 'desc';
-  return (
-    connection
-      .select(
-        'articles.title',
-        'articles.topic',
-        'articles.author',
-        'articles.body',
-        'articles.created_at',
-        'articles.votes',
-        'articles.article_id'
-      )
-      .from('articles')
-      .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
-      .count('comments.article_id AS comment_count')
-      // .count('articles.article_id AS total_count')
-      .groupBy('articles.article_id')
-      .modify(query => {
-        if (remainingQueries.author) {
-          query.where('articles.author', '=', remainingQueries.author);
-        } else if (article_id) {
-          query.where('articles.article_id', '=', article_id).first();
-        } else {
-          query.where(remainingQueries);
-        }
-      })
-      .orderBy(criteria, order)
-      .limit(limit)
-      .offset(limit * (p - 1))
-      .returning('*')
-      .then(articles => {
-        if (!articles)
-          return Promise.reject({
-            status: 404,
-            msg: `User: '${article_id}' Not Found`
-          });
-        if (Array.isArray(articles)) {
-          articles.forEach(article => {
-            article.comment_count = +article.comment_count;
-          });
-        } else {
-          articles.comment_count = +articles.comment_count;
-        }
-        return articles;
-      })
-  );
+  const articlesQ = connection
+    .select(
+      'articles.title',
+      'articles.topic',
+      'articles.author',
+      'articles.body',
+      'articles.created_at',
+      'articles.votes',
+      'articles.article_id'
+    )
+    .from('articles')
+    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
+    .count('comments.article_id AS comment_count')
+    .groupBy('articles.article_id')
+    .modify(query => {
+      if (remainingQueries.author) {
+        query.where('articles.author', '=', remainingQueries.author);
+      } else if (article_id) {
+        query.where('articles.article_id', '=', article_id).first();
+      } else {
+        query.where(remainingQueries);
+      }
+    })
+    .orderBy(criteria, order)
+    .limit(limit)
+    .offset(limit * (p - 1))
+    .returning('*');
+
+  const counted = connection('articles')
+    .count('article_id as total_count')
+    .modify(query => {
+      if (remainingQueries.author) {
+        query.where('articles.author', '=', remainingQueries.author);
+      } else if (article_id) {
+        query.where('articles.article_id', '=', article_id);
+      } else {
+        query.where(remainingQueries);
+      }
+    });
+  return Promise.all([articlesQ, counted]).then(result => {
+    const [articles, [count]] = result;
+    if (!articles)
+      return Promise.reject({
+        status: 404,
+        msg: `User: '${article_id}' Not Found`
+      });
+    if (Array.isArray(articles)) {
+      articles.forEach(article => {
+        article.comment_count = +article.comment_count;
+      });
+    } else {
+      articles.comment_count = +articles.comment_count;
+    }
+    if (!Array.isArray(articles)) {
+      return articles;
+    }
+    const newArticle = { articles, total_count: count.total_count };
+    return newArticle;
+  });
 };
 
 exports.updateArticleProp = (prop, id) => {

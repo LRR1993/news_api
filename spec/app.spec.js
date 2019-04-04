@@ -125,13 +125,20 @@ describe('/', () => {
               );
             });
         });
-        it.skip('display the total number of articles with any filters applied, discounting the limit', () => {
+        it('display the total number of articles with any filters applied, discounting the limit', () => {
           return request
             .get('/api/articles')
             .expect(200)
-            .then(({ body: { articles } }) => {
-              console.log(articles);
-              expect(articles.total_count).to.exist;
+            .then(({ body: { total_count } }) => {
+              expect(total_count).to.be.equal('12');
+            });
+        });
+        it.only('display the total number of articles with any filters applied, discounting the limit', () => {
+          return request
+            .get('/api/articles?author=icellusedkars')
+            .expect(200)
+            .then(({ body: { total_count } }) => {
+              expect(total_count).to.be.equal('6');
             });
         });
         it('GET returns status 200 and returns comment count in relation to articles', () => {
@@ -224,7 +231,7 @@ describe('/', () => {
               expect(articles.length).to.equal(5);
             });
         });
-        it('accepts a sort query, to sort by author', () => {
+        it('accepts a filter query, to sort by author', () => {
           return request
             .get('/api/articles?author=butter_bridge')
             .expect(200)
@@ -235,7 +242,7 @@ describe('/', () => {
               ).to.be.true;
             });
         });
-        it('accepts a sort query, to sort by topic', () => {
+        it('accepts a filter query, to sort by topic', () => {
           return request
             .get('/api/articles?topic=mitch')
             .expect(200)
@@ -289,7 +296,7 @@ describe('/', () => {
               expect(articles.length).to.be.below(11);
             });
         });
-        it.only('returns empty array when page number out of range if articles', () => {
+        it('returns empty array when page number out of range if articles', () => {
           return request
             .get('/api/articles?p=5')
             .expect(200)
