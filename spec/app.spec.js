@@ -133,7 +133,7 @@ describe('/', () => {
               expect(total_count).to.be.equal('12');
             });
         });
-        it.only('display the total number of articles with any filters applied, discounting the limit', () => {
+        it('display the total number of articles with any filters applied, discounting the limit', () => {
           return request
             .get('/api/articles?author=icellusedkars')
             .expect(200)
