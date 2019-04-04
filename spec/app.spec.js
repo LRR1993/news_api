@@ -125,6 +125,15 @@ describe('/', () => {
               );
             });
         });
+        it.only('display the total number of articles with any filters applied, discounting the limit', () => {
+          return request
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              console.log(articles);
+              expect(articles.total_count).to.exist;
+            });
+        });
         it('GET returns status 200 and returns comment count in relation to articles', () => {
           return request
             .get('/api/articles')
@@ -142,8 +151,79 @@ describe('/', () => {
               expect(articles).to.be.descendingBy('created_at');
             });
         });
+        it('articles limit of 10', () => {
+          return request
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.be.below(11);
+            });
+        });
       });
       describe('GET QUERIES', () => {
+        it("accepts a page query 'p=2'", () => {
+          return request
+            .get('/api/articles?p=2')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.equal(2);
+              expect(articles[0]).to.eql({
+                title: 'Am I a cat?',
+                topic: 'mitch',
+                author: 'icellusedkars',
+                body:
+                  'Having run out of ideas for articles, I am staring at the wall blankly, like a cat. Does this make me a cat?',
+                created_at: '1978-11-25T12:21:54.171Z',
+                votes: 0,
+                article_id: 11,
+                comment_count: 0
+              });
+            });
+        });
+        it("accepts a page query'p=1'", () => {
+          return request
+            .get('/api/articles?p=1')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.equal(10);
+              expect(articles[0]).to.eql({
+                title: 'Living in the shadow of a great man',
+                topic: 'mitch',
+                author: 'butter_bridge',
+                body: 'I find this existence challenging',
+                created_at: '2018-11-15T12:21:54.171Z',
+                votes: 100,
+                article_id: 1,
+                comment_count: 13
+              });
+            });
+        });
+        it('accept page and limit query', () => {
+          return request
+            .get('/api/articles?p=2&limit=5')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.equal(5);
+              expect(articles[0]).to.eql({
+                title: 'A',
+                topic: 'mitch',
+                author: 'icellusedkars',
+                body: 'Delicious tin of cat food',
+                votes: 0,
+                article_id: 6,
+                comment_count: 1,
+                created_at: '1998-11-20T12:21:54.171Z'
+              });
+            });
+        });
+        it('accepts a limit query of 5', () => {
+          return request
+            .get('/api/articles?limit=5')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.equal(5);
+            });
+        });
         it('accepts a sort query, to sort by author', () => {
           return request
             .get('/api/articles?author=butter_bridge')
@@ -183,6 +263,48 @@ describe('/', () => {
         });
       });
       describe('ERROR HANDLING', () => {
+        it('defaults to articles page 1, when invalid query entered', () => {
+          return request
+            .get('/api/articles?p=notanum')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.be.below(11);
+              expect(articles[9]).to.eql({
+                title: 'Seven inspirational thought leaders from Manchester UK',
+                topic: 'mitch',
+                author: 'rogersop',
+                body: "Who are we kidding, there is only one, and it's Mitch!",
+                created_at: '1982-11-24T12:21:54.171Z',
+                votes: 0,
+                article_id: 10,
+                comment_count: 0
+              });
+            });
+        });
+        it('defaults to articles page 1, when invalid query entered', () => {
+          return request
+            .get('/api/articles?p=-1')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.be.below(11);
+            });
+        });
+        it('defaults to articles limit of 10, when invalid query entered', () => {
+          return request
+            .get('/api/articles?limit=notanum')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.be.below(11);
+            });
+        });
+        it('defaults to articles limit of 10, when invalid query entered', () => {
+          return request
+            .get('/api/articles?limit=-1')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).to.be.below(11);
+            });
+        });
         it('return an error when author does not exist', () => {
           return request
             .get('/api/articles?author=not_a_user')

@@ -3,58 +3,67 @@ const connection = require('../db/connection');
 exports.getArticles = ({
   sort_by: criteria = 'articles.created_at',
   order = 'desc',
+  limit = 10,
+  p = 1,
   article_id,
   ...remainingQueries
 }) => {
+  if (isNaN(limit) || limit < 0) limit = 10;
+  if (isNaN(p) || p < 0) p = 1;
   if (order !== 'desc' && order !== 'asc') order = 'desc';
-  return connection
-    .select(
-      'articles.title',
-      'articles.topic',
-      'articles.author',
-      'articles.body',
-      'articles.created_at',
-      'articles.votes',
-      'articles.article_id'
-    )
-    .from('articles')
-    .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
-    .count('comments.article_id AS comment_count')
-    .groupBy('articles.article_id')
-    .modify(query => {
-      if (remainingQueries.author) {
-        query.where('articles.author', '=', remainingQueries.author);
-      } else if (article_id) {
-        query.where('articles.article_id', '=', article_id).first();
-      } else {
-        query.where(remainingQueries);
-      }
-    })
-    .orderBy(criteria, order)
-    .returning('*')
-    .then(articles => {
-      if (!articles)
-        return Promise.reject({
-          status: 404,
-          msg: `User: '${article_id}' Not Found`
-        });
-      if (articles.length < 1) {
-        let errName = remainingQueries.author;
-        if (remainingQueries.topic) errName = remainingQueries.topic;
-        return Promise.reject({
-          status: 400,
-          msg: `Bad Request: '${errName}' Not Found`
-        });
-      }
-      if (Array.isArray(articles)) {
-        articles.forEach(article => {
-          article.comment_count = +article.comment_count;
-        });
-      } else {
-        articles.comment_count = +articles.comment_count;
-      }
-      return articles;
-    });
+  return (
+    connection
+      .select(
+        'articles.title',
+        'articles.topic',
+        'articles.author',
+        'articles.body',
+        'articles.created_at',
+        'articles.votes',
+        'articles.article_id'
+      )
+      .from('articles')
+      .leftJoin('comments', 'comments.article_id', '=', 'articles.article_id')
+      .count('comments.article_id AS comment_count')
+      // .count('articles.article_id AS total_count')
+      .groupBy('articles.article_id')
+      .modify(query => {
+        if (remainingQueries.author) {
+          query.where('articles.author', '=', remainingQueries.author);
+        } else if (article_id) {
+          query.where('articles.article_id', '=', article_id).first();
+        } else {
+          query.where(remainingQueries);
+        }
+      })
+      .orderBy(criteria, order)
+      .limit(limit)
+      .offset(limit * (p - 1))
+      .returning('*')
+      .then(articles => {
+        if (!articles)
+          return Promise.reject({
+            status: 404,
+            msg: `User: '${article_id}' Not Found`
+          });
+        if (articles.length < 1) {
+          let errName = remainingQueries.author;
+          if (remainingQueries.topic) errName = remainingQueries.topic;
+          return Promise.reject({
+            status: 400,
+            msg: `Bad Request: '${errName}' Not Found`
+          });
+        }
+        if (Array.isArray(articles)) {
+          articles.forEach(article => {
+            article.comment_count = +article.comment_count;
+          });
+        } else {
+          articles.comment_count = +articles.comment_count;
+        }
+        return articles;
+      })
+  );
 };
 
 exports.updateArticleProp = (prop, id) => {
