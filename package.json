@@ -44,5 +44,8 @@
     "hooks": {
       "pre-commit": "npm test"
     }
+  },
+  "engines": {
+    "node": "11.x"
   }
 }
