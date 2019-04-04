@@ -11,6 +11,7 @@
     "test": "mocha ./spec/*.spec.js",
     "seed": "knex seed:run",
     "seed-test": "NODE_ENV=test knex seed:run",
+    "seed-prod": "NODE_ENV=production DATABASE_URL=$(heroku config: get DATABASE_URL) knex seed:run",
     "dev": "nodemon listen.js",
     "start": "node listen.js",
     "lint": "eslint ./ --fix",
