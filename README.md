@@ -2,7 +2,7 @@
 
 The news api allows access to the news accessing various topics and articles relating those topics.
 
-## Table of Contents
+## Table of Contents :book:
 
 1.  [Getting Started](#Getting-Started)
     1.  [Prerequisites](#Prerequisites)
@@ -15,11 +15,11 @@ The news api allows access to the news accessing various topics and articles rel
 6.  [License](#license)
 7.  [Acknowledgments](#Acknowledgments)
 
-## Getting-Started
+## Getting-Started :running:
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-Folder structure below
+Folder structure below :open_file_folder:
 
 ```
  ├── models/
@@ -38,70 +38,181 @@ Folder structure below
  │  └──── ultils.spec.js
  ├─── db/
  │  └──── connection.js <-- node-postrgres connection configuration
- │  └──── config.js <-- database info (port/host/database name)
- │  └──── seed.sql
- │  └──── api.js
- │  └──── xx.js
+ │  └──── seeds
+ │    └──── seed.sql
+ │  └──── migrations
+ │    └──── xx.js
+ │  └──── test-data
+ │    └──── ...-data
+ │  └──── dev-data
+ │    └──── ...-data
+ │  └──── setup.sql <-- database creation
  ├── app.js
  ├── listen.js
- ├── knexfile.js
+ ├── knexfile.js <-- database info (port/host/database name)
  ├── .gitignore
  ├── package-lock.json
  ├── prettierrc
- ├── .eslintrc.js
+ ├── .eslintrc.js <-- style formmatter
  ├── Procfile
  ├── README.md
 ```
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Please install the software below, description of how to install them (with links are below)
+**Assume user is using an OSX**
+
+Requirements:
 
 ```
-Give examples
+Node
+NPM
+GIT
+Postgresql
 ```
+
+if you already have these installed skip to [Installing](#Installing).
+
+#### Install Homebrew
+
+```
+Run this command on your terminal application to install Homebrew:
+
+~/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Update Homebrew:
+
+brew update
+```
+
+#### Install Git
+
+```
+See if you already have Git by running:
+
+git --version
+
+'If you already have Git it will tell you a version number.'
+
+'If you do not see a version number, install Git with Homebrew:'
+
+brew install git
+
+$ git --version
+
+'again to confirm Git has been installed'.
+```
+
+#### Install NVM (Node Version Manager) and Node
+
+So far you could only run JavaScript code on a web browser, attached to an HTML page. Node.js allows us to run JavaScript code directly from our terminal. We'll use Node.js extensively during the course and on the Precourse so it's important to have an up-to-date version installed.
+
+```
+Run this command in your terminal to install Node Version Manager which allows you to easily download the latest version of Node, and switch between versions at a later date if you need to:
+
+`$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.6/install.sh | bash`
+
+Check it has installed correctly by typing this command on the terminal:
+
+`$ nvm --version`
+
+Again, if you see a version number you are good.
+
+Now install Node using NVM:
+
+`$ nvm install node`
+
+`$ nvm use node`
+
+`$ source ~/.nvm/nvm.sh`
+
+You may need to quit and reopen your terminal application before you see it has been successful. To check success, type:
+
+`$ node --version`
+
+If you have an earlier version than 6, type:
+
+`$ nvm install 8.6.0`
+
+`$ nvm use 8.6.0`
+
+`$ node --version`
+
+Now you should see that you are using Node version 8.6.0
+```
+
+#### Install PostgreSQL
+
+PostgreSQL is another database we'll use during the course. Again, don't worry if this doesn't seem to go as you planned, you won't need it for the Precourse and we can sort you out at the install session!
+
+Install the Postgres app by going here and downloading it:
+
+[Get Postgres.app](https://postgresapp.com/)
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
 
-Say what the step will be
+1. create a directory to save your app in.
 
 ```
-Give the example
+mkdir your-folder-name
 ```
 
-And repeat
+2. save files and sub folders in the folder you just craeted
+3. Open the package JSON for information on requirements and dependencies
+4. Install the packages
 
 ```
-until finished
+npm i
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+(will install information from the package.json)
+
+5. App created and ready to run.
 
 ## Running-the-tests
 
-Explain how to run the automated tests for this system
+1. Testing the app and database: run `npm t` to test all the enpoints and routes, if more endpoints are added please test before deployment.
 
-### Break down into end to end tests
+2. Development Env: Refer to [README_scripts](README_scripts.md) for scripts to update and test the database. Refer to `package.json` for testing scripts to be run.
 
-Explain what these tests test and why
+### Coding style and testing tests
 
-```
-Give an example
-```
+ESLint and Prettirt used to format the code. Open [eslintrc.js](.eslintrc.js) & [prettierrc](.prettierrc) for more infomration. Update these files to change any code formatting issues.
 
-### And coding style tests
-
-Explain what these tests test and why
+To update code style
 
 ```
-Give an example
+npm run lint
 ```
+
+Note: this will format all the files in the directory.
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Before live deployment ensure pre commit hooks are installed. This app uses husky and eslint to esnure consistent code. If these arent installed please use the commands below and update the package json to include.
+
+```
+npm i husky
+```
+
+```js
+// package.json
+ "scripts": {
+    "lint": "eslint ./ --fix",
+    "posttest": "npm run lint"
+ },
+   "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
+
+```
+
+This app is currentely hosted on Heroku,
+Link: [nc_news_letisha](https://nc-news-letisha.herokuapp.com/api/)
 
 ## Built-With
 
@@ -115,7 +226,7 @@ Please see [contributors](https://github.com/LRR1993/news_api/graphs/contributor
 
 ## Versioning
 
-We use [GitHub](https://github.com/) for versioning. For the versions available, see the [tags on this repository](https://github.com/LRR1993/news_api/tags).
+[GitHub](https://github.com/) for versioning. For the versions available, see the [tags on this repository](https://github.com/LRR1993/news_api/tags).
 
 ## Authors
 
