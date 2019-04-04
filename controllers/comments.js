@@ -14,7 +14,7 @@ exports.deleteCommentById = (req, res, next) => {
 exports.updateCommentById = (req, res, next) => {
   updateCommentEntry(req.body, req.params)
     .then(comment => {
-      res.status(201).json({ comment });
+      res.status(200).json({ comment });
     })
     .catch(next);
 };

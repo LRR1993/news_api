@@ -391,38 +391,34 @@ describe('/', () => {
             return request
               .patch('/api/articles/1')
               .send({ inc_votes: 1 })
-              .expect(201)
-              .then(res => {
-                expect(res.body.article).to.eql([
-                  {
-                    article_id: 1,
-                    title: 'Living in the shadow of a great man',
-                    topic: 'mitch',
-                    author: 'butter_bridge',
-                    body: 'I find this existence challenging',
-                    created_at: '2018-11-15T12:21:54.171Z',
-                    votes: 101
-                  }
-                ]);
+              .expect(200)
+              .then(({ body: { article } }) => {
+                expect(article).to.eql({
+                  article_id: 1,
+                  title: 'Living in the shadow of a great man',
+                  topic: 'mitch',
+                  author: 'butter_bridge',
+                  body: 'I find this existence challenging',
+                  created_at: '2018-11-15T12:21:54.171Z',
+                  votes: 101
+                });
               });
           });
           it('PATCHES the votes of a article to reduce the votes', () => {
             return request
               .patch('/api/articles/1')
               .send({ inc_votes: -1 })
-              .expect(201)
-              .then(res => {
-                expect(res.body.article).to.eql([
-                  {
-                    article_id: 1,
-                    title: 'Living in the shadow of a great man',
-                    topic: 'mitch',
-                    author: 'butter_bridge',
-                    body: 'I find this existence challenging',
-                    created_at: '2018-11-15T12:21:54.171Z',
-                    votes: 99
-                  }
-                ]);
+              .expect(200)
+              .then(({ body: { article } }) => {
+                expect(article).to.eql({
+                  article_id: 1,
+                  title: 'Living in the shadow of a great man',
+                  topic: 'mitch',
+                  author: 'butter_bridge',
+                  body: 'I find this existence challenging',
+                  created_at: '2018-11-15T12:21:54.171Z',
+                  votes: 99
+                });
               });
           });
           it('DELETES specfic articles for the id given', () => {
@@ -497,210 +493,319 @@ describe('/', () => {
               });
           });
         });
-      });
-      describe('/comments', () => {
-        describe('DEFAULTS', () => {
-          it('GET returns status 200 and returns an array of objects of comments', () => {
-            return request
-              .get('/api/articles/1/comments')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments[0]).to.have.all.keys(
-                  'comment_id',
-                  'votes',
-                  'created_at',
-                  'author',
-                  'body'
-                );
-              });
-          });
-          it('comments are ordered to be descedning by created_at', () => {
-            return request
-              .get('/api/articles/1/comments')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.be.descendingBy('created_at');
-              });
-          });
-        });
-        describe('POST', () => {
-          it('posts a new comment to the corresponding article id', () => {
-            return request
-              .post('/api/articles/1/comments')
-              .send({
-                username: 'butter_bridge',
-                body: 'This is awesome'
-              })
-              .expect(201)
-              .then(({ body: { comment } }) => {
-                expect(comment[0]).to.have.keys(
-                  'comment_id',
-                  'author',
-                  'article_id',
-                  'votes',
-                  'body',
-                  'created_at'
-                );
-                expect(comment[0].author).to.equal('butter_bridge');
-                expect(comment[0].comment_id).to.equal(19);
-                expect(comment[0].body).to.equal('This is awesome');
-              });
-          });
-        });
-        describe('GET QUERIES', () => {
-          it('can set the order to be ascending by created_at', () => {
-            return request
-              .get('/api/articles/1/comments?order=asc')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.be.ascendingBy('created_at');
-              });
-          });
-          it('can sort by votes(defaults to descending order)', () => {
-            return request
-              .get('/api/articles/1/comments?sort_by=votes')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.be.descendingBy('votes');
-              });
-          });
-          it('can sort by comment_id(defaults to descending order)', () => {
-            return request
-              .get('/api/articles/1/comments?sort_by=comment_id')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.be.descendingBy('comment_id');
-              });
-          });
-          it('can sort by author(defaults to descending order)', () => {
-            return request
-              .get('/api/articles/1/comments?sort_by=author')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments[0]).to.be.eql({
-                  author: 'icellusedkars',
-                  body: 'Fruit pastilles',
-                  created_at: '2005-11-25T12:36:03.389Z',
-                  votes: 0,
-                  comment_id: 13
+
+        describe('/comments', () => {
+          describe('DEFAULTS', () => {
+            it('GET returns status 200 and returns an array of objects of comments', () => {
+              return request
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments[0]).to.have.all.keys(
+                    'comment_id',
+                    'votes',
+                    'created_at',
+                    'author',
+                    'body'
+                  );
                 });
-                expect(comments.slice(-1)[0]).to.eql({
-                  author: 'butter_bridge',
-                  body:
-                    'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-                  created_at: '2016-11-22T12:36:03.389Z',
-                  votes: 14,
-                  comment_id: 2
+            });
+            it('articles limit of 10', () => {
+              return request
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.be.below(11);
                 });
-              });
-          });
-        });
-        describe('ERROR HANDLING', () => {
-          describe('ERRORS-Route Methods', () => {
-            it('returns error when incorrect method used', () => {
-              const notMethods = ['delete', 'put', 'patch'];
-              return Promise.all(
-                notMethods.map(method => {
-                  return request[method]('/api/articles/1/comments')
-                    .expect(405)
-                    .then(({ body: { msg } }) => {
-                      expect(msg).to.equal('Method Not Allowed');
-                    });
-                })
-              );
+            });
+            it('comments are ordered to be descedning by created_at', () => {
+              return request
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('created_at');
+                });
             });
           });
-          it('cant post a comment for a user that doesnt exist', () => {
-            return request
-              .post('/api/articles/1/comments')
-              .send({
-                username: 'not_exist',
-                body: 'This is awesome'
-              })
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.eql('Error Code: 23503');
-              });
+          describe('POST', () => {
+            it('posts a new comment to the corresponding article id', () => {
+              return request
+                .post('/api/articles/1/comments')
+                .send({
+                  username: 'butter_bridge',
+                  body: 'This is awesome'
+                })
+                .expect(201)
+                .then(({ body: { comment } }) => {
+                  expect(comment).to.have.keys(
+                    'comment_id',
+                    'author',
+                    'article_id',
+                    'votes',
+                    'body',
+                    'created_at'
+                  );
+                  expect(comment.author).to.equal('butter_bridge');
+                  expect(comment.comment_id).to.equal(19);
+                  expect(comment.body).to.equal('This is awesome');
+                });
+            });
           });
-          it('returns an error when not a valid search parameter is queired', () => {
-            return request
-              .get('/api/articles/1/comments?sort_by=notAColumn')
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(`Error Code: 42703`);
-              });
+          describe('GET QUERIES', () => {
+            it("accepts a page query 'p=2'", () => {
+              return request
+                .get('/api/articles/1/comments?p=2')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.equal(3);
+                  expect(comments[0]).to.eql({
+                    author: 'icellusedkars',
+                    body: 'Massive intercranial brain haemorrhage',
+                    created_at: '2006-11-25T12:36:03.389Z',
+                    votes: 0,
+                    comment_id: 12
+                  });
+                });
+            });
+            it("accepts a page query'p=1'", () => {
+              return request
+                .get('/api/articles/1/comments?p=1')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.equal(10);
+                  expect(comments[0]).to.eql({
+                    author: 'butter_bridge',
+                    body:
+                      'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+                    created_at: '2016-11-22T12:36:03.389Z',
+                    votes: 14,
+                    comment_id: 2
+                  });
+                });
+            });
+            it('accept page and limit query', () => {
+              return request
+                .get('/api/articles/1/comments?p=2&limit=5')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.equal(5);
+                  expect(comments[0]).to.eql({
+                    author: 'icellusedkars',
+                    body: 'Lobster pot',
+                    created_at: '2011-11-24T12:36:03.389Z',
+                    votes: 0,
+                    comment_id: 7
+                  });
+                });
+            });
+            it('accepts a limit query of 5', () => {
+              return request
+                .get('/api/articles/1/comments?limit=5')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.equal(5);
+                });
+            });
+            it('can set the order to be ascending by created_at', () => {
+              return request
+                .get('/api/articles/1/comments?order=asc')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.ascendingBy('created_at');
+                });
+            });
+            it('can sort by votes(defaults to descending order)', () => {
+              return request
+                .get('/api/articles/1/comments?sort_by=votes')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('votes');
+                });
+            });
+            it('can sort by comment_id(defaults to descending order)', () => {
+              return request
+                .get('/api/articles/1/comments?sort_by=comment_id')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('comment_id');
+                });
+            });
+            it('can sort by author(defaults to descending order)', () => {
+              return request
+                .get('/api/articles/1/comments?sort_by=author')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments[0]).to.be.eql({
+                    author: 'icellusedkars',
+                    body: 'Fruit pastilles',
+                    created_at: '2005-11-25T12:36:03.389Z',
+                    votes: 0,
+                    comment_id: 13
+                  });
+                  expect(comments.slice(-1)[0]).to.eql({
+                    author: 'icellusedkars',
+                    body: 'Ambidextrous marsupial',
+                    created_at: '2007-11-25T12:36:03.389Z',
+                    votes: 0,
+                    comment_id: 11
+                  });
+                });
+            });
           });
-          it('returns default behavior, when order query invalid', () => {
-            return request
-              .get('/api/articles/1/comments?order=notADirection')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.be.descendingBy('created_at');
-              });
-          });
-          it('return an error when id does not exist', () => {
-            return request
-              .get('/api/articles/99999999/comments')
-              .expect(200)
-              .then(({ body: { comments } }) => {
-                expect(comments).to.eql([]);
-              });
-          });
-          it('return an error when id does not exist', () => {
-            return request
-              .get('/api/articles/notAuser/comments')
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(`Error Code: 22P02`);
-              });
-          });
-          it('cant post to an id that doesnt exist, returns an error', () => {
-            return request
-              .post('/api/articles/99999999/comments')
-              .send({
-                username: 'butter_bridge',
-                body: 'This is awesome'
-              })
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(`Error Code: 23503`);
-              });
-          });
-          it('cant post to an id of the wrong type, returns', () => {
-            return request
-              .post('/api/articles/notAuser/comments')
-              .send({
-                username: 'butter_bridge',
-                body: 'This is awesome'
-              })
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(`Error Code: 22P02`);
-              });
-          });
-          it('returns and error when body is empty', () => {
-            return request
-              .post('/api/articles/1/comments')
-              .send({})
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
+          describe('ERROR HANDLING', () => {
+            describe('ERRORS-Route Methods', () => {
+              it('returns error when incorrect method used', () => {
+                const notMethods = ['delete', 'put', 'patch'];
+                return Promise.all(
+                  notMethods.map(method => {
+                    return request[method]('/api/articles/1/comments')
+                      .expect(405)
+                      .then(({ body: { msg } }) => {
+                        expect(msg).to.equal('Method Not Allowed');
+                      });
+                  })
                 );
               });
-          });
-          it('returns and error when body isnt given', () => {
-            return request
-              .post('/api/articles/1/comments')
-              .send({
-                username: 'butter_bridge'
-              })
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
-                );
-              });
+            });
+            it('defaults to articles page 1, when invalid query entered', () => {
+              return request
+                .get('/api/articles/1/comments?p=notanum')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.be.below(11);
+                  expect(comments[9]).to.eql({
+                    author: 'icellusedkars',
+                    body: 'Ambidextrous marsupial',
+                    created_at: '2007-11-25T12:36:03.389Z',
+                    votes: 0,
+                    comment_id: 11
+                  });
+                });
+            });
+            it('defaults to articles page 1, when invalid query entered', () => {
+              return request
+                .get('/api/articles/1/comments?p=-1')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.be.below(11);
+                });
+            });
+            it('returns empty array when page number out of range if articles', () => {
+              return request
+                .get('/api/articles/1/comments?p=5')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.eql([]);
+                });
+            });
+            it('defaults to articles limit of 10, when invalid query entered', () => {
+              return request
+                .get('/api/articles/1/comments?limit=notanum')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.be.below(11);
+                });
+            });
+            it('defaults to articles limit of 10, when invalid query entered', () => {
+              return request
+                .get('/api/articles/1/comments?limit=-1')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments.length).to.be.below(11);
+                });
+            });
+            it('cant post a comment for a user that doesnt exist', () => {
+              return request
+                .post('/api/articles/1/comments')
+                .send({
+                  username: 'not_exist',
+                  body: 'This is awesome'
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.eql('Error Code: 23503');
+                });
+            });
+            it('returns an error when not a valid search parameter is queired', () => {
+              return request
+                .get('/api/articles/1/comments?sort_by=notAColumn')
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(`Error Code: 42703`);
+                });
+            });
+            it('returns default behavior, when order query invalid', () => {
+              return request
+                .get('/api/articles/1/comments?order=notADirection')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.be.descendingBy('created_at');
+                });
+            });
+            it('return an error when id does not exist', () => {
+              return request
+                .get('/api/articles/99999999/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments).to.eql([]);
+                });
+            });
+            it('return an error when id does not exist', () => {
+              return request
+                .get('/api/articles/notAuser/comments')
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(`Error Code: 22P02`);
+                });
+            });
+            it('cant post to an id that doesnt exist, returns an error', () => {
+              return request
+                .post('/api/articles/99999999/comments')
+                .send({
+                  username: 'butter_bridge',
+                  body: 'This is awesome'
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(`Error Code: 23503`);
+                });
+            });
+            it('cant post to an id of the wrong type, returns', () => {
+              return request
+                .post('/api/articles/notAuser/comments')
+                .send({
+                  username: 'butter_bridge',
+                  body: 'This is awesome'
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(`Error Code: 22P02`);
+                });
+            });
+            it('returns and error when body is empty', () => {
+              return request
+                .post('/api/articles/1/comments')
+                .send({})
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(
+                    'Bad Request: malformed body / missing required fields'
+                  );
+                });
+            });
+            it('returns and error when body isnt given', () => {
+              return request
+                .post('/api/articles/1/comments')
+                .send({
+                  username: 'butter_bridge'
+                })
+                .expect(400)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal(
+                    'Bad Request: malformed body / missing required fields'
+                  );
+                });
+            });
           });
         });
       });
@@ -757,38 +862,34 @@ describe('/', () => {
         return request
           .patch('/api/comments/1')
           .send({ inc_votes: 1 })
-          .expect(201)
-          .then(res => {
-            expect(res.body.comment).to.eql([
-              {
-                comment_id: 1,
-                article_id: 9,
-                author: 'butter_bridge',
-                body:
-                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-                votes: 17,
-                created_at: '2017-11-22T12:36:03.389Z'
-              }
-            ]);
+          .expect(200)
+          .then(({ body: { comment } }) => {
+            expect(comment).to.eql({
+              comment_id: 1,
+              article_id: 9,
+              author: 'butter_bridge',
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 17,
+              created_at: '2017-11-22T12:36:03.389Z'
+            });
           });
       });
       it('PATCHES the votes of a article to reduce the votes', () => {
         return request
           .patch('/api/comments/1')
           .send({ inc_votes: -1 })
-          .expect(201)
-          .then(res => {
-            expect(res.body.comment).to.eql([
-              {
-                comment_id: 1,
-                article_id: 9,
-                author: 'butter_bridge',
-                body:
-                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-                votes: 15,
-                created_at: '2017-11-22T12:36:03.389Z'
-              }
-            ]);
+          .expect(200)
+          .then(({ body: { comment } }) => {
+            expect(comment).to.eql({
+              comment_id: 1,
+              article_id: 9,
+              author: 'butter_bridge',
+              body:
+                "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+              votes: 15,
+              created_at: '2017-11-22T12:36:03.389Z'
+            });
           });
       });
       describe('ERROR HANDLING', () => {

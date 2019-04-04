@@ -19,11 +19,12 @@ exports.updateCommentEntry = (prop, id) => {
     .increment('votes', prop.inc_votes)
     .returning('*')
     .then(votes => {
+      const [updatedProp] = votes;
       if (!prop.inc_votes)
         return Promise.reject({
           status: 400,
           msg: 'Bad Request: malformed body / missing required fields'
         });
-      return votes;
+      return updatedProp;
     });
 };

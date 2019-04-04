@@ -78,12 +78,13 @@ exports.updateArticleProp = (prop, id) => {
     .increment('votes', prop.inc_votes)
     .returning('*')
     .then(votes => {
+      const [updatedProp] = votes;
       if (!prop.inc_votes)
         return Promise.reject({
           status: 400,
           msg: 'Bad Request: malformed body / missing required fields'
         });
-      return votes;
+      return updatedProp;
     });
 };
 
@@ -104,11 +105,15 @@ exports.getComments = (
   {
     sort_by: criteria = 'comments.created_at',
     order = 'desc',
+    limit = 10,
+    p = 1,
     ...remainingQueries
   },
   id
 ) => {
   if (order !== 'desc' && order !== 'asc') order = 'desc';
+  if (isNaN(limit) || limit < 0) limit = 10;
+  if (isNaN(p) || p < 0) p = 1;
   return connection
     .select(
       'comments.author',
@@ -128,6 +133,8 @@ exports.getComments = (
       }
     })
     .orderBy(criteria, order)
+    .limit(limit)
+    .offset(limit * (p - 1))
     .returning('*');
 };
 
@@ -141,11 +148,12 @@ exports.makeComment = ({ username, ...remainingBody }, id) => {
     .insert(formattedBody)
     .returning('*')
     .then(comment => {
+      const [newComment] = comment;
       if (!comment[0].author || !comment[0].body)
         return Promise.reject({
           status: 400,
           msg: 'Bad Request: malformed body / missing required fields'
         });
-      return comment;
+      return newComment;
     });
 };
