@@ -811,6 +811,70 @@ describe('/', () => {
       });
     });
     describe('/users', () => {
+      it('GET returns status 200 and returns an array of objects of users', () => {
+        return request
+          .get('/api/users')
+          .expect(200)
+          .then(({ body: { users } }) => {
+            expect(users[0]).to.have.all.keys('username', 'name', 'avatar_url');
+          });
+      });
+      it('posts a new user ', () => {
+        return request
+          .post('/api/users')
+          .send({
+            username: 'tisha1993',
+            name: 'tish',
+            avatar_url:
+              'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4'
+          })
+          .expect(201)
+          .then(({ body: { user } }) => {
+            expect(user).to.eql({
+              username: 'tisha1993',
+              name: 'tish',
+              avatar_url:
+                'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4'
+            });
+          });
+      });
+      describe('ERRORS', () => {
+        it('returns and error when body is empty', () => {
+          return request
+            .post('/api/users')
+            .send({})
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
+        });
+        it('returns and error when body isnt given', () => {
+          return request
+            .post('/api/users')
+            .send({
+              username: 'tish'
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
+        });
+        describe('ERRORS-Route Methods', () => {
+          it('returns error when incorrect method used', () => {
+            const notMethods = ['delete', 'put', 'patch'];
+            return Promise.all(
+              notMethods.map(method => {
+                return request[method]('/api/users/')
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal('Method Not Allowed');
+                  });
+              })
+            );
+          });
+        });
+      });
+
       describe('/:username', () => {
         it('GET returns status 200 and returns an array of objects of users', () => {
           return request
@@ -820,37 +884,37 @@ describe('/', () => {
               expect(user).to.have.all.keys('username', 'avatar_url', 'name');
             });
         });
-      });
-      describe('ERROR HANDLING', () => {
-        describe('ERRORS-Route Methods', () => {
-          it('returns error when incorrect method used', () => {
-            const notMethods = ['delete', 'put', 'patch', 'post'];
-            return Promise.all(
-              notMethods.map(method => {
-                return request[method]('/api/users/1')
-                  .expect(405)
-                  .then(({ body: { msg } }) => {
-                    expect(msg).to.equal('Method Not Allowed');
-                  });
-              })
-            );
+        describe('ERROR HANDLING', () => {
+          describe('ERRORS-Route Methods', () => {
+            it('returns error when incorrect method used', () => {
+              const notMethods = ['delete', 'put', 'patch', 'post'];
+              return Promise.all(
+                notMethods.map(method => {
+                  return request[method]('/api/users/1')
+                    .expect(405)
+                    .then(({ body: { msg } }) => {
+                      expect(msg).to.equal('Method Not Allowed');
+                    });
+                })
+              );
+            });
           });
-        });
-        it('return an error when id is the wrong type', () => {
-          return request
-            .get('/api/users/99999999')
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal(`Bad Request: '99999999' invalid input`);
-            });
-        });
-        it('return an error when id does not exist', () => {
-          return request
-            .get('/api/users/notAuser')
-            .expect(404)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal(`User: 'notAuser' Not Found`);
-            });
+          it('return an error when id is the wrong type', () => {
+            return request
+              .get('/api/users/99999999')
+              .expect(400)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`Bad Request: '99999999' invalid input`);
+              });
+          });
+          it('return an error when id does not exist', () => {
+            return request
+              .get('/api/users/notAuser')
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal(`User: 'notAuser' Not Found`);
+              });
+          });
         });
       });
     });

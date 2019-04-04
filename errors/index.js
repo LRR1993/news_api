@@ -8,7 +8,7 @@ exports.methodNotAllowed = (req, res) => {
 exports.handlePsqlErrors = (err, req, res, next) => {
   const psqlBadRequestCodes = ['22P02'];
   const psqlSyntaxError = ['42703'];
-  const psqlConstraintViolation = ['23503'];
+  const psqlConstraintViolation = ['23503', '23502'];
   if (psqlBadRequestCodes.includes(err.code))
     res.status(400).json({ msg: `Error Code: ${err.code}` || 'Bad Request' });
   if (psqlSyntaxError.includes(err.code))

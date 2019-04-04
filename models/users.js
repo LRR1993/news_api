@@ -1,6 +1,6 @@
 const connection = require('../db/connection');
 
-exports.getUsers = id => {
+exports.getUser = id => {
   return connection
     .select('*')
     .from('users')
@@ -19,5 +19,22 @@ exports.getUsers = id => {
           msg: `User: '${id.username}' Not Found`
         });
       return user;
+    });
+};
+
+exports.getUsers = () => {
+  return connection
+    .select('*')
+    .from('users')
+    .returning('*');
+};
+
+exports.makeUser = user => {
+  return connection('users')
+    .insert(user)
+    .returning('*')
+    .then(insertedUser => {
+      const [newUser] = insertedUser;
+      return newUser;
     });
 };
