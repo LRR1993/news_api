@@ -20,10 +20,10 @@ exports.updateCommentEntry = (prop, id) => {
     .returning('*')
     .then(votes => {
       const [updatedProp] = votes;
-      if (!prop.inc_votes)
+      if (!updatedProp)
         return Promise.reject({
-          status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
+          status: 404,
+          msg: `Comment: '${id.comment_id}' Not Found`
         });
       return updatedProp;
     });

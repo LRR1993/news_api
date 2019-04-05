@@ -182,7 +182,7 @@ describe('/', () => {
             .expect(200)
             .then(({ body: { articles } }) => {
               expect(articles[0]).to.contain.keys('comment_count');
-              expect(articles[0].comment_count).to.equal(13);
+              expect(articles[0].comment_count).to.equal('13');
             });
         });
         it('articles to be in descending order by date by default', () => {
@@ -201,25 +201,26 @@ describe('/', () => {
               expect(articles.length).to.be.below(11);
             });
         });
-      });
-      it('posts a new article ', () => {
-        return request
-          .post('/api/articles')
-          .send({
-            title: 'everyone loves cats',
-            body: 'who doesnt love cats',
-            topic: 'cats',
-            author: 'butter_bridge'
-          })
-          .expect(201)
-          .then(({ body: { article } }) => {
-            expect(article.title).to.eql('everyone loves cats');
-            expect(article.body).to.eql('who doesnt love cats');
-            expect(article.article_id).to.equal(13);
-            expect(article.author).to.equal('butter_bridge');
-            expect(article.created_at).to.exist;
-            expect(article.votes).to.equal(0);
-          });
+
+        it('posts a new article ', () => {
+          return request
+            .post('/api/articles')
+            .send({
+              title: 'everyone loves cats',
+              body: 'who doesnt love cats',
+              topic: 'cats',
+              author: 'butter_bridge'
+            })
+            .expect(201)
+            .then(({ body: { article } }) => {
+              expect(article.title).to.eql('everyone loves cats');
+              expect(article.body).to.eql('who doesnt love cats');
+              expect(article.article_id).to.equal(13);
+              expect(article.author).to.equal('butter_bridge');
+              expect(article.created_at).to.exist;
+              expect(article.votes).to.equal(0);
+            });
+        });
       });
       describe('GET QUERIES', () => {
         it("accepts a page query 'p=2'", () => {
@@ -237,7 +238,7 @@ describe('/', () => {
                 created_at: '1978-11-25T12:21:54.171Z',
                 votes: 0,
                 article_id: 11,
-                comment_count: 0
+                comment_count: '0'
               });
             });
         });
@@ -255,7 +256,7 @@ describe('/', () => {
                 created_at: '2018-11-15T12:21:54.171Z',
                 votes: 100,
                 article_id: 1,
-                comment_count: 13
+                comment_count: '13'
               });
             });
         });
@@ -272,7 +273,7 @@ describe('/', () => {
                 body: 'Delicious tin of cat food',
                 votes: 0,
                 article_id: 6,
-                comment_count: 1,
+                comment_count: '1',
                 created_at: '1998-11-20T12:21:54.171Z'
               });
             });
@@ -353,7 +354,7 @@ describe('/', () => {
               topic: 'cats',
               author: 'not_exist'
             })
-            .expect(400)
+            .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).to.eql('Error Code: 23503');
             });
@@ -372,7 +373,7 @@ describe('/', () => {
                 created_at: '1982-11-24T12:21:54.171Z',
                 votes: 0,
                 article_id: 10,
-                comment_count: 0
+                comment_count: '0'
               });
             });
         });
@@ -427,9 +428,18 @@ describe('/', () => {
         it('returns an error when not a valid search parameter is queired', () => {
           return request
             .get('/api/articles?sort_by=notAColumn')
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal(`Error Code: 42703`);
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles[0]).to.eql({
+                title: 'Living in the shadow of a great man',
+                topic: 'mitch',
+                author: 'butter_bridge',
+                body: 'I find this existence challenging',
+                created_at: '2018-11-15T12:21:54.171Z',
+                votes: 100,
+                article_id: 1,
+                comment_count: '13'
+              });
             });
         });
         it('returns default behavior, when order query invalid', () => {
@@ -472,7 +482,7 @@ describe('/', () => {
                   'article_id',
                   'comment_count'
                 );
-                expect(article.comment_count).to.equal(13);
+                expect(article.comment_count).to.equal('13');
               });
           });
           it('PATCHES the votes of a article to increase the votes', () => {
@@ -548,11 +558,17 @@ describe('/', () => {
             return request
               .patch('/api/articles/1')
               .send({})
-              .expect(400)
-              .then(({ body: { msg } }) => {
-                expect(msg).to.equal(
-                  'Bad Request: malformed body / missing required fields'
-                );
+              .expect(200)
+              .then(({ body: { article } }) => {
+                expect(article).to.eql({
+                  article_id: 1,
+                  title: 'Living in the shadow of a great man',
+                  body: 'I find this existence challenging',
+                  votes: 101,
+                  topic: 'mitch',
+                  author: 'butter_bridge',
+                  created_at: '2018-11-15T12:21:54.171Z'
+                });
               });
           });
           it('returns and error when body is the wrong type', () => {
@@ -562,6 +578,15 @@ describe('/', () => {
               .expect(400)
               .then(({ body: { msg } }) => {
                 expect(msg).to.equal(`Error Code: 22P02`);
+              });
+          });
+          it('PATCH status:404 non-existent article_id is used', () => {
+            return request
+              .patch('/api/articles/99999999')
+              .send({ inc_votes: 1 })
+              .expect(404)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("Article: '99999999' Not Found");
               });
           });
           it('return an error when id to be deleted does not exist', () => {
@@ -809,17 +834,24 @@ describe('/', () => {
                   username: 'not_exist',
                   body: 'This is awesome'
                 })
-                .expect(400)
+                .expect(404)
                 .then(({ body: { msg } }) => {
                   expect(msg).to.eql('Error Code: 23503');
                 });
             });
-            it('returns an error when not a valid search parameter is queired', () => {
+            it('returns an error when not a valid search parameter is queried', () => {
               return request
                 .get('/api/articles/1/comments?sort_by=notAColumn')
-                .expect(400)
-                .then(({ body: { msg } }) => {
-                  expect(msg).to.equal(`Error Code: 42703`);
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                  expect(comments[0]).to.eql({
+                    author: 'butter_bridge',
+                    body:
+                      'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+                    created_at: '2016-11-22T12:36:03.389Z',
+                    votes: 14,
+                    comment_id: 2
+                  });
                 });
             });
             it('returns default behavior, when order query invalid', () => {
@@ -853,7 +885,7 @@ describe('/', () => {
                   username: 'butter_bridge',
                   body: 'This is awesome'
                 })
-                .expect(400)
+                .expect(404)
                 .then(({ body: { msg } }) => {
                   expect(msg).to.equal(`Error Code: 23503`);
                 });
@@ -1075,11 +1107,17 @@ describe('/', () => {
           return request
             .patch('/api/comments/1')
             .send({})
-            .expect(400)
-            .then(({ body: { msg } }) => {
-              expect(msg).to.equal(
-                'Bad Request: malformed body / missing required fields'
-              );
+            .expect(200)
+            .then(({ body: { comment } }) => {
+              expect(comment).to.eql({
+                comment_id: 1,
+                author: 'butter_bridge',
+                article_id: 9,
+                votes: 17,
+                created_at: '2017-11-22T12:36:03.389Z',
+                body:
+                  "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+              });
             });
         });
         it('returns and error when body is the wrong type', () => {
@@ -1089,6 +1127,15 @@ describe('/', () => {
             .expect(400)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal(`Error Code: 22P02`);
+            });
+        });
+        it('PATCH status:404 non-existent comment_id is used', () => {
+          return request
+            .patch('/api/comments/99999999')
+            .send({ inc_votes: 1 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("Comment: '99999999' Not Found");
             });
         });
       });

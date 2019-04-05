@@ -8,6 +8,16 @@ exports.getArticles = ({
   article_id,
   ...remainingQueries
 }) => {
+  const sortingArr = [
+    'article_id',
+    'title',
+    'body',
+    'votes',
+    'topic',
+    'author',
+    'created_at'
+  ];
+  if (!sortingArr.includes(criteria)) criteria = 'articles.created_at';
   if (isNaN(limit) || limit < 0) limit = 10;
   if (isNaN(p) || p < 0) p = 1;
   if (order !== 'desc' && order !== 'asc') order = 'desc';
@@ -57,13 +67,6 @@ exports.getArticles = ({
         status: 404,
         msg: `User: '${article_id}' Not Found`
       });
-    if (Array.isArray(articles)) {
-      articles.forEach(article => {
-        article.comment_count = +article.comment_count;
-      });
-    } else {
-      articles.comment_count = +articles.comment_count;
-    }
     if (!Array.isArray(articles)) {
       return articles;
     }
@@ -79,10 +82,10 @@ exports.updateArticleProp = (prop, id) => {
     .returning('*')
     .then(votes => {
       const [updatedProp] = votes;
-      if (!prop.inc_votes)
+      if (!updatedProp)
         return Promise.reject({
-          status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
+          status: 404,
+          msg: `Article: '${id.article_id}' Not Found`
         });
       return updatedProp;
     });
@@ -111,6 +114,15 @@ exports.getComments = (
   },
   id
 ) => {
+  const sortingArr = [
+    'comment_id',
+    'author',
+    'article_id',
+    'created_at',
+    'body',
+    'votes'
+  ];
+  if (!sortingArr.includes(criteria)) criteria = 'comments.created_at';
   if (order !== 'desc' && order !== 'asc') order = 'desc';
   if (isNaN(limit) || limit < 0) limit = 10;
   if (isNaN(p) || p < 0) p = 1;
