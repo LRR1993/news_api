@@ -76,12 +76,19 @@ describe('/', () => {
             expect(topics[0]).to.have.all.keys('description', 'slug');
           });
       });
-      it('returns an error if an topic id/slug is inputted(not a topic route)', () => {
+      it('posts a new topic ', () => {
         return request
-          .get('/api/topics/1')
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal('Route Not Found');
+          .post('/api/topics')
+          .send({
+            slug: 'sports',
+            description: 'eveything apart from bowling'
+          })
+          .expect(201)
+          .then(({ body: { topic } }) => {
+            expect(topic).to.eql({
+              slug: 'sports',
+              description: 'eveything apart from bowling'
+            });
           });
       });
       describe('ERRORS', () => {
@@ -93,8 +100,16 @@ describe('/', () => {
               expect(msg).to.equal('Route Not Found');
             });
         });
+        it('returns an error if an topic id/slug is inputted(not a topic route)', () => {
+          return request
+            .get('/api/topics/1')
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Route Not Found');
+            });
+        });
         it('returns error when incorrect method used', () => {
-          const notMethods = ['delete', 'put', 'patch', 'post'];
+          const notMethods = ['delete', 'put', 'patch'];
           return Promise.all(
             notMethods.map(method => {
               return request[method]('/api/topics')
@@ -104,6 +119,26 @@ describe('/', () => {
                 });
             })
           );
+        });
+        it('returns and error when body is empty', () => {
+          return request
+            .post('/api/topics')
+            .send({})
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
+        });
+        it('returns and error when body isnt given', () => {
+          return request
+            .post('/api/topics')
+            .send({
+              slug: 'tish'
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
         });
       });
     });
