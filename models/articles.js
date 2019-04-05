@@ -149,11 +149,16 @@ exports.makeComment = ({ username, ...remainingBody }, id) => {
     .returning('*')
     .then(comment => {
       const [newComment] = comment;
-      if (!comment[0].author || !comment[0].body)
-        return Promise.reject({
-          status: 400,
-          msg: 'Bad Request: malformed body / missing required fields'
-        });
       return newComment;
+    });
+};
+
+exports.makeArticle = article => {
+  return connection('articles')
+    .insert(article)
+    .returning('*')
+    .then(insertedArticle => {
+      const [newArticle] = insertedArticle;
+      return newArticle;
     });
 };

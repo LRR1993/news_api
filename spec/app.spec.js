@@ -202,6 +202,25 @@ describe('/', () => {
             });
         });
       });
+      it('posts a new article ', () => {
+        return request
+          .post('/api/articles')
+          .send({
+            title: 'everyone loves cats',
+            body: 'who doesnt love cats',
+            topic: 'cats',
+            author: 'butter_bridge'
+          })
+          .expect(201)
+          .then(({ body: { article } }) => {
+            expect(article.title).to.eql('everyone loves cats');
+            expect(article.body).to.eql('who doesnt love cats');
+            expect(article.article_id).to.equal(13);
+            expect(article.author).to.equal('butter_bridge');
+            expect(article.created_at).to.exist;
+            expect(article.votes).to.equal(0);
+          });
+      });
       describe('GET QUERIES', () => {
         it("accepts a page query 'p=2'", () => {
           return request
@@ -305,6 +324,40 @@ describe('/', () => {
         });
       });
       describe('ERROR HANDLING', () => {
+        it('returns and error when body is empty', () => {
+          return request
+            .post('/api/articles')
+            .send({})
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
+        });
+        it('returns and error when all body isnt given', () => {
+          return request
+            .post('/api/articles')
+            .send({
+              title: 'This should be an error'
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal('Error Code: 23502');
+            });
+        });
+        it('cant post an article for a user that doesnt exist', () => {
+          return request
+            .post('/api/articles/')
+            .send({
+              title: 'everyone loves cats',
+              body: 'who doesnt love cats',
+              topic: 'cats',
+              author: 'not_exist'
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.eql('Error Code: 23503');
+            });
+        });
         it('defaults to articles page 1, when invalid query entered', () => {
           return request
             .get('/api/articles?p=notanum')
@@ -389,7 +442,7 @@ describe('/', () => {
         });
         describe('ERRORS-Route Methods', () => {
           it('returns error when incorrect method used', () => {
-            const notMethods = ['delete', 'put', 'patch', 'post'];
+            const notMethods = ['delete', 'put', 'patch'];
             return Promise.all(
               notMethods.map(method => {
                 return request[method]('/api/articles')
@@ -823,9 +876,7 @@ describe('/', () => {
                 .send({})
                 .expect(400)
                 .then(({ body: { msg } }) => {
-                  expect(msg).to.equal(
-                    'Bad Request: malformed body / missing required fields'
-                  );
+                  expect(msg).to.equal('Error Code: 23502');
                 });
             });
             it('returns and error when body isnt given', () => {
@@ -836,9 +887,7 @@ describe('/', () => {
                 })
                 .expect(400)
                 .then(({ body: { msg } }) => {
-                  expect(msg).to.equal(
-                    'Bad Request: malformed body / missing required fields'
-                  );
+                  expect(msg).to.equal('Error Code: 23502');
                 });
             });
           });

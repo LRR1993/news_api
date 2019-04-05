@@ -5,6 +5,7 @@ const {
   updateArticle,
   deleteArticle,
   sendCommentsById,
+  addArticle,
   addComment
 } = require('../controllers/articles');
 
@@ -13,6 +14,7 @@ const { methodNotAllowed } = require('../errors');
 articlesRouter
   .route('/')
   .get(sendArticles)
+  .post(addArticle)
   .all(methodNotAllowed);
 
 articlesRouter

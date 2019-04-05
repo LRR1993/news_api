@@ -3,7 +3,8 @@ const {
   updateArticleProp,
   deleteArticleProp,
   getComments,
-  makeComment
+  makeComment,
+  makeArticle
 } = require('../models/articles');
 
 exports.sendArticles = (req, res, next) => {
@@ -50,6 +51,14 @@ exports.addComment = (req, res, next) => {
   makeComment(req.body, req.params)
     .then(comment => {
       res.status(201).json({ comment });
+    })
+    .catch(next);
+};
+
+exports.addArticle = (req, res, next) => {
+  makeArticle(req.body)
+    .then(article => {
+      res.status(201).json({ article });
     })
     .catch(next);
 };
